@@ -31,8 +31,8 @@ csa_prediction_engine/
 - **Multi-y Predictions**: Perform predictions with multiple dependent variables and a single set of circumstances.
 - **Multi-theta Predictions**: Perform predictions with one dependent variable and multiple sets of circumstances.
 - **Relevance-Based Grid Predictions**: Generate optimal predictions by evaluating all thresholds and variable combinations.
-- **MaxFit Predictions**: Find the best-fit model based on adjusted relevance.
 - **Grid Singularity Predictions**: Analyze grid predictions to find the singular optimal solution.
+- **MaxFit Predictions**: Find the best-fit model based on adjusted relevance.
 
 ## Installation
 
