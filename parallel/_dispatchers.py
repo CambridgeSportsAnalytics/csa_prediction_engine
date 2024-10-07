@@ -18,7 +18,7 @@ support@csanalytics.io
 
 
 from ._workers import (
-    _predict_worker,
+    _psr_predict_worker,
     _maxfit_predict_worker,
     _grid_predict_worker,
     _grid_singularity_worker,
@@ -26,7 +26,7 @@ from ._workers import (
 )
 
 
-def dispatch_predict_task(args):
+def dispatch_psr_task(args):
     """
     Dispatches a single prediction task to the _predict_worker function.
 
@@ -46,7 +46,7 @@ def dispatch_predict_task(args):
         executing the prediction task.
     """
     
-    return _predict_worker(*args)
+    return _psr_predict_worker(*args)
 
 
 def dispatch_maxfit_task(args):

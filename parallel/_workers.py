@@ -56,7 +56,7 @@ from csa_prediction_engine.helpers._postmaster import (
 PRINT_LOCK = threading.Lock()
 
 
-def _predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray, 
+def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray, 
                     theta_matrix:ndarray, Options:PredictionOptions):
     """
     Executes a single relevance-based prediction task.
@@ -92,7 +92,7 @@ def _predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(f"Processing relevance-based prediction task {q}", PRINT_LOCK)
+    thread_safe_print(f"Processing partial sample regression prediction task {q}", PRINT_LOCK)
     
     # Call relevance-based predict for a single task and send inputs to CSA's API
     job_id, job_code = _post_predict_inputs(y=y, X=X, theta=theta, Options=Options)

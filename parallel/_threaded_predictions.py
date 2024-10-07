@@ -50,7 +50,7 @@ from csa_prediction_engine.parallel._dispatchers import (
     dispatch_grid_task,
     dispatch_grid_singularity_task,
     dispatch_maxfit_task,
-    dispatch_predict_task,
+    dispatch_psr_task,
     dispatch_get_results
 )
 
@@ -60,7 +60,7 @@ _DISPATCHER_MAP = {
     PSRFunction.GRID: dispatch_grid_task,
     PSRFunction.GRID_SINGULARITY: dispatch_grid_singularity_task,
     PSRFunction.MAXFIT: dispatch_maxfit_task,
-    PSRFunction.PSR: dispatch_predict_task
+    PSRFunction.PSR: dispatch_psr_task
 }
 
 
