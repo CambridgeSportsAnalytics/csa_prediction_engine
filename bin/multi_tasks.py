@@ -15,7 +15,7 @@ Supported Prediction Types:
 
 Supported Functions:
 --------------------
-1. `predict`: Standard multi-task relevance-based prediction.
+1. `predict_psr`: Standard multi-task relevance-based prediction.
 2. `predict_maxfit`: Multi-task prediction optimized for maximum fit.
 3. `predict_grid`: Composite prediction from a grid evaluation.
 4. `predict_grid_singularity`: Identifies the best singular solution among grid evaluations.

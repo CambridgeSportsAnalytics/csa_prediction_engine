@@ -36,7 +36,7 @@ from csa_prediction_engine.helpers._payload_handler import (
 )
 
 # Utlity function for processing ndarrays withing dictionaries
-from csa_common_lib._helpers._conversions import (
+from csa_common_lib.helpers._conversions import (
         convert_ndarray_to_list
     ) 
 

@@ -28,21 +28,22 @@ from ._workers import (
 
 def dispatch_psr_task(args):
     """
-    Dispatches a single prediction task to the _predict_worker function.
+    Dispatches a single prediction task to the _psr_predict_worker function.
 
     This function takes a tuple of arguments and passes them to the 
-    _predict_worker function for execution in a parallel environment.
+    _psr_predict_worker function for execution in a parallel environment.
 
     Parameters
     ----------
     args : tuple
-        The arguments required by the _predict_worker function, 
-        which include all necessary parameters for the prediction task.
+        The arguments required by the _psr_predict_worker function, 
+        which include all necessary parameters for the partial sample
+        regression prediction task.
 
     Returns
     -------
     result : Any
-        The result returned by the _predict_worker function after 
+        The result returned by the _psr_predict_worker function after 
         executing the prediction task.
     """
     
