@@ -67,11 +67,8 @@ from csa_common_lib.classes.prediction_options import (
 from csa_common_lib.enum_types.functions import PSRFunction  # Function type enumeration
 from csa_common_lib.enum_types.job_types import JobType      # Job type enumeration
 
-# Importing task modules
-from .bin import (
-    single_tasks,  # Module for single task predictions
-    multi_tasks    # Module for multi-task predictions
-)
+# Importing single prediction task modules
+from .bin import single_tasks # Module for single task predictions
 
 # Import parallelization modules
 from .parallel._threaded_predictions import (
