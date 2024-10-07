@@ -73,7 +73,7 @@ def run_multi_y(model_type:PSRFunction, y_matrix:ndarray, X:ndarray, theta:ndarr
     Parameters
     ----------
     model_type : PSRFunction
-        Type of prediction model (PREDICT, MAXFIT, GRID, or GRID_SINGULARITY).
+        Type of prediction model (PSR, MAXFIT, GRID, or GRID_SINGULARITY).
     y_matrix : ndarray [N-by-Q]
         Matrix of Q-column vectors of the dependent variable (prediction tasks).
     X : ndarray [N-by-K]
@@ -138,7 +138,7 @@ def run_multi_theta(model_type:PSRFunction, y:ndarray, X:ndarray, theta_matrix:n
     Parameters
     ----------
     model_type : PSRFunction
-        Type of prediction model (PREDICT, MAXFIT, GRID, or GRID_SINGULARITY).
+        Type of prediction model (PSR, MAXFIT, GRID, or GRID_SINGULARITY).
     y : ndarray [N-by-1]
         Column-vector of the dependent variable.
     X : ndarray [N-by-K]
