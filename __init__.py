@@ -60,7 +60,7 @@ from csa_common_lib.classes.prediction_options import (
     GridOptions
 )
 # End-points
-from .relevance_engine import (
+from .api_client import (
     predict,
     predict_maxfit,
     predict_grid,
