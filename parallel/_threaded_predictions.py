@@ -21,7 +21,7 @@ Dispatcher Map
 --------------
 The module uses a dispatcher mapping (`_DISPATCHER_MAP`) to route the 
 appropriate task function based on the `PSRFunction` type provided 
-(e.g., `PREDICT`, `MAXFIT`, `GRID`, `GRID_SINGULARITY`). The dispatchers 
+(e.g., `PSR`, `MAXFIT`, `GRID`, `GRID_SINGULARITY`). The dispatchers 
 are responsible for handling the respective prediction tasks.
 
 Usage

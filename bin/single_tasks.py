@@ -8,7 +8,7 @@ single set of circumstances (theta).
 
 Supported Functions:
 --------------------
-1. `predict`: Performs a standard single task relevance-based prediction.
+1. `predict_psr`: Performs a standard single task relevance-based prediction.
 2. `predict_maxfit`: Executes a single task prediction optimized for maximum fit.
 3. `predict_grid`: Calculates a composite prediction based on a grid evaluation.
 4. `predict_grid_singularity`: Identifies the singularity of grid evaluations.
