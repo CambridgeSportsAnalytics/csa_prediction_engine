@@ -73,11 +73,17 @@ from .bin import (
     multi_tasks    # Module for multi-task predictions
 )
 
+# Import parallelization modules
+from .parallel._threaded_predictions import (
+    run_multi_theta,
+    run_multi_y
+)
+
 # Use a mapping to call the appropriate function based on task type
 _TASK_MAP = {
     JobType.SINGLE: single_tasks.predict,
-    JobType.MULTI_THETA: multi_tasks.run_multi_theta,
-    JobType.MULTI_Y: multi_tasks.run_multi_y
+    JobType.MULTI_THETA: run_multi_theta,
+    JobType.MULTI_Y: run_multi_y
 }
 
 

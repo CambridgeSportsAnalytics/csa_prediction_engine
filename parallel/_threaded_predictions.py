@@ -82,7 +82,7 @@ def run_multi_y(model_type:PSRFunction, y_matrix:ndarray, X:ndarray, theta:ndarr
         Row vector of circumstances.
     Options : PredictionOptions
         Base class object containing all optional inputs.
-        Use MaxFitOptions and GridOptions where applicable (they inherit
+        Use MaxFitOptions and GridOptions where applicable (inherits
         from PredictionOptions).
         
     Returns
@@ -147,7 +147,7 @@ def run_multi_theta(model_type:PSRFunction, y:ndarray, X:ndarray, theta_matrix:n
         Matrix of Q-row vectors of circumstances.
     Options : PredictionOptions
         Base class object containing all optional inputs.
-        Use MaxFitOptions and GridOptions where applicable (they inherit
+        Use MaxFitOptions and GridOptions where applicable (inherits
         from PredictionOptions).
         
     Returns
