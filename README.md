@@ -8,6 +8,7 @@ The package is structured as follows:
 
 ```
 csa_prediction_engine/
+    ├── api_client.py                # Main module for user interactions
     ├── bin/                         # Internal modules for task management
     │   ├── _workers_.py             # Executes various single prediction models
     │   └── single_tasks.py          # Handles single task predictions
