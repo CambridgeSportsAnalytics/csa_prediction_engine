@@ -60,7 +60,7 @@ _DISPATCHER_MAP = {
     PSRFunction.GRID: dispatch_grid_task,
     PSRFunction.GRID_SINGULARITY: dispatch_grid_singularity_task,
     PSRFunction.MAXFIT: dispatch_maxfit_task,
-    PSRFunction.PREDICT: dispatch_predict_task
+    PSRFunction.PSR: dispatch_predict_task
 }
 
 

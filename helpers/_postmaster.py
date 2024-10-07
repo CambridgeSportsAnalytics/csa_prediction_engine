@@ -93,7 +93,7 @@ def _post_predict_inputs(y, X, theta, Options:PredictionOptions):
     # Post partial-sample regression model inputs to the server and
     # let is calculate results.
     response, job_id, job_code = post_job(
-        PSRFunction.PREDICT,
+        PSRFunction.PSR,
         y=y,
         X=X,
         theta=theta,

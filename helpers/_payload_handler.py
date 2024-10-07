@@ -112,7 +112,7 @@ def post_job(function_type:PSRFunction, **varargin):
     
     # API end-point dictionary    
     api_resource = {
-        int(PSRFunction.PREDICT): 'https://api.csanalytics.io/v2/prediction-engine/psr',
+        int(PSRFunction.PSR): 'https://api.csanalytics.io/v2/prediction-engine/psr',
         int(PSRFunction.MAXFIT): 'https://api.csanalytics.io/v2/prediction-engine/maxfit',
         int(PSRFunction.GRID): 'https://api.csanalytics.io/v2/prediction-engine/grid',
         int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid_singularity',

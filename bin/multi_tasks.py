@@ -76,7 +76,7 @@ def predict(y_matrix, X, theta, Options:PredictionOptions, poll_results:bool=Fal
         Model details accesible via key-value pairs.
     """
     
-    yhat, yhat_details = run_multi_y(PSRFunction.PREDICT, y_matrix, X, theta, Options)
+    yhat, yhat_details = run_multi_y(PSRFunction.PSR, y_matrix, X, theta, Options)
 
     # Return results object
     return yhat, yhat_details

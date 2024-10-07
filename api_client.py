@@ -127,7 +127,7 @@ def predict(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.PREDICT, y, X, theta, Options, poll_results=True)
+    yhat, yhat_details = prediction_function(PSRFunction.PSR, y, X, theta, Options, poll_results=True)
     
     # Return result(s)
     return yhat, yhat_details
