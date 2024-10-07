@@ -11,7 +11,7 @@ methods.
 Available Modules
 -----------------
 - `relevance_engine`: Core module containing functions for different 
-  prediction tasks, including `predict`, `predict_maxfit`, `predict_grid`, 
+  prediction tasks, including `predict_psr`, `predict_maxfit`, `predict_grid`, 
   and `predict_grid_singularity`.
 - `csa_common_lib`: Shared library that includes common classes, enums, 
   and validation tools to support the prediction engine's functionality.
@@ -19,7 +19,7 @@ Available Modules
 Key Components
 --------------
 - `PSRFunction`: Enumeration of the available prediction function types 
-  such as `PREDICT`, `MAXFIT`, `GRID`, and `GRID_SINGULARITY`.
+  such as `PSR`, `MAXFIT`, `GRID`, and `GRID_SINGULARITY`.
 - `PSRResult`: Enumeration of the expected result types for each prediction function.
 - `PSRStatus`: Enumeration for exit flags that indicate the status of the 
   prediction process.
@@ -61,7 +61,7 @@ from csa_common_lib.classes.prediction_options import (
 )
 # End-points
 from .api_client import (
-    predict,
+    predict_psr,
     predict_maxfit,
     predict_grid,
     predict_grid_singularity

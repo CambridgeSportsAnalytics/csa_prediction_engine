@@ -81,9 +81,10 @@ _TASK_MAP = {
 }
 
 
-def predict(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
+def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
     """
-    Calculates relevance-based predictions using the CSA API. 
+    Calculates partial sample regression predictions based on relevance
+    using the CSA API. 
     
     This function supports three types of prediction tasks:   
     1. Single prediction task: A single dependent variable and a single set of circumstances.
