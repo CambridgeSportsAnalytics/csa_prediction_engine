@@ -43,7 +43,7 @@ from csa_common_lib.classes.prediction_options import (
 )
 
 # Parallel prediction imports
-from ..parallel.threaded_predictions import (
+from ..parallel._threaded_predictions import (
     run_multi_y,        # Execute batch prediction tasks for multiple y-variables
     run_multi_theta     # Execute batch prediction tasks for multiple circumstances (theta)
 )

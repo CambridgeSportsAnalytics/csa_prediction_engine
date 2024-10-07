@@ -6,7 +6,7 @@ for simplified access.
 """
 
 
-from csa_prediction_engine.parallel.threaded_predictions import (
+from csa_prediction_engine.parallel._threaded_predictions import (
     run_multi_theta,
     run_multi_y
 )
