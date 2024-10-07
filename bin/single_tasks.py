@@ -25,189 +25,69 @@ support@csanalytics.io
 # Local imports
 from ..helpers import _postmaster
 
-# CSA Common Library imports
+# Local application/library-specific imports
+from csa_common_lib.enum_types.functions import PSRFunction
 from csa_common_lib.classes.prediction_options import (
     PredictionOptions,
     MaxFitOptions,
     GridOptions
 )
+from csa_common_lib.classes.prediction_receipt import PredictionReceipt
+
+# Import single prediction workers
+from ._workers import (
+    predict_grid,
+    predict_grid_singularity,
+    predict_maxfit,
+    predict_psr
+)
+
+# Dispatcher mapping based on PSRFunction type.
+# Maps different prediction tasks to their corresponding dispatcher functions.
+_DISPATCHER_MAP = {
+    PSRFunction.GRID: predict_grid,
+    PSRFunction.GRID_SINGULARITY: predict_grid_singularity,
+    PSRFunction.MAXFIT: predict_maxfit,
+    PSRFunction.PSR: predict_psr
+}
 
 
-def predict(y, X, theta, Options:PredictionOptions, poll_results:bool=False):
-    """ 
-    Runs and evaluates a prediction using the relevance-based model. 
+def predict(model_type:PSRFunction, y, X, theta, Options:PredictionOptions):
+    """
+    Entry point for running multiple prediction tasks stratified by 
+    y (dependent variables).
     
     Parameters
     ----------
+    model_type : PSRFunction
+        Type of prediction model (PSR, MAXFIT, GRID, or GRID_SINGULARITY).
     y : ndarray [N-by-1]
-        Column vector of the dependent variable.
+        Matrix of Q-column vectors of the dependent variable (prediction tasks).
     X : ndarray [N-by-K]
         Matrix of independent variables.
     theta : [1-by-K]
         Row vector of circumstances.
     Options : PredictionOptions
-        Options object that contains the necessary key-value parameters
-        for grid predictions.
-    poll_results : boolean, optional (default=True)
-        If true, wait for server to return results, computational time
-        may vary. If false, the server will return job id and job code.
-
+        Base class object containing all optional inputs.
+        Use MaxFitOptions and GridOptions where applicable (inherits
+        from PredictionOptions).
+        
     Returns
     -------
-    yhat : ndarray
-        Prediction outcome(s).
+    yhat : ndarray [1-by-T]
+        Prediction outcomes, T thresholds if multiple tresholds specified.
     yhat_details : dict
         Model details accesible via key-value pairs.
     """
     
-    # Send linear regression job to postmaster
-    job_id, job_code = _postmaster._post_predict_inputs(
-        y=y, X=X, theta=theta, Options=Options
-    )
+    # Get the corresponding dispatcher function
+    dispatcher = _DISPATCHER_MAP.get(model_type)
     
-    # Get results from server
-    if poll_results:
-        yhat, yhat_details = _postmaster._get_results_worker(job_id, job_code)
+    # Call the dispatcher function with the provided arguments
+    yhat, yhat_details = dispatcher(y=y, X=X, theta=theta, Options=Options, poll_results=True)
     
-        # Return results object
-        return yhat, yhat_details
+    # Return results
+    return yhat, yhat_details
     
-    else:
-        return job_id, job_code
-    
-    
-def predict_maxfit(y, X, theta, Options:MaxFitOptions, poll_results:bool=False):
-    """ 
-    Runs and evaluates a prediction using the relevance-based model 
-    and solves for maximum (adjusted) fit.
 
-    Parameters
-    ----------
-    y : ndarray [N-by-1]
-        Column vector of the dependent variable.
-    X : ndarray [N-by-K]
-        Matrix of independent variables.
-    theta : [1-by-K]
-        Row vector of circumstances.
-    Options : MaxFitOptions
-        MaxFitOptions object that contains the necessary key-value parameters
-        for grid predictions.
-    poll_results : boolean, optional (default=True)
-        If true, wait for server to return results, computational time
-        may vary. If false, the server will return job id and job code.
 
-    Returns
-    -------
-    yhat : ndarray
-        Prediction outcome(s).
-    yhat_details : dict
-        Model details accesible via key-value pairs.
-    """
-    
-    # Send maxfit partial sample regression job to postmaster
-    job_id, job_code = _postmaster._post_maxfit_inputs(
-        y=y, X=X, theta=theta, Options=Options)
-    
-    # Get results from server
-    if poll_results:
-        yhat, yhat_details = _postmaster._get_results_worker(job_id, job_code)
-    
-        # Return results object
-        return yhat, yhat_details
-    
-    else:
-        return job_id, job_code
-    
-    
-def predict_grid(y, X, theta, Options:GridOptions, poll_results=True):
-    """ 
-    Runs and evaluates a grid prediction using the relevance-based
-    model and weights each grid cell solution by its adjusted-fit to 
-    solve for a composite prediction outcome. 
-    
-    Parameters
-    ----------
-    y : ndarray [N-by-1]
-        Column vector of the dependent variable.
-    X : ndarray [N-by-K]
-        Matrix of independent variables.
-    theta : [1-by-K]
-        Row vector of circumstances.
-    Options : GridOptions
-        GridOptions object that contains the necessary key-value parameters
-        for grid predictions.
-    poll_results : boolean, optional (default=True)
-        If true, wait for server to return results, computational time
-        may vary. If false, the server will return job id and job code.
-
-    Returns
-    -------
-    Returns yhat and yhat_details by default, if poll_results is False,
-    then this function returns job id and job code.
-    
-    yhat : ndarray
-        Prediction outcome(s).
-    yhat_details : dict
-        Model details accesible via key-value pairs.
-    """
-    
-    # Send grid prediction job to postmaster
-    job_id, job_code = _postmaster._post_grid_inputs(
-        y, X, theta, Options=Options)
-    
-    # Get results from server
-    if poll_results:
-        yhat, yhat_details = _postmaster._get_results(job_id, job_code)
-    
-        # Return results object
-        return yhat, yhat_details
-    
-    else:
-        return job_id, job_code
-    
-    
-def predict_grid_singularity(y, X, theta, Options:GridOptions, poll_results=True):
-    """ 
-    Runs and evaluates a grid singularity prediction using the 
-    relevance-based model and solves for maximum adjusted fit with 
-    optimal variable selection. 
-    
-    Parameters
-    ----------
-    y : ndarray [N-by-1]
-        Column vector of the dependent variable.
-    X : ndarray [N-by-K]
-        Matrix of independent variables.
-    theta : [1-by-K]
-        Row vector of circumstances.
-    Options : GridOptions
-        GridOptions object that contains the necessary key-value parameters
-        for grid predictions.
-    poll_results : boolean, optional (default=True)
-        If true, wait for server to return results, computational time
-        may vary. If false, the server will return job id and job code.
-
-    Returns
-    -------
-    Returns yhat and yhat_details by default, if poll_results is False,
-    then this function returns job id and job code.
-    
-    yhat : ndarray
-        Prediction outcome(s).
-    yhat_details : dict
-        Model details accesible via key-value pairs.
-    """
-    
-    # Send grid prediction job to postmaster
-    job_id, job_code = _postmaster._post_grid_inputs(
-        y, X, theta, Options=Options)
-    
-    # Get results from server
-    if poll_results:
-        yhat, yhat_details = _postmaster._get_results(job_id, job_code)
-    
-        # Return results object
-        return yhat, yhat_details
-    
-    else:
-        return job_id, job_code
