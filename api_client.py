@@ -131,7 +131,7 @@ def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.PSR, y, X, theta, Options, poll_results=True)
+    yhat, yhat_details = prediction_function(PSRFunction.PSR, y, X, theta, Options)
     
     # Return result(s)
     return yhat, yhat_details
@@ -186,7 +186,7 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions):
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.MAXFIT, y, X, theta, Options, poll_results=True)
+    yhat, yhat_details = prediction_function(PSRFunction.MAXFIT, y, X, theta, Options)
     
     # Return result(s)
     return yhat, yhat_details
@@ -241,7 +241,7 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions):
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID, y, X, theta, Options, poll_results=True)
+    yhat, yhat_details = prediction_function(PSRFunction.GRID, y, X, theta, Options)
     
     # Return result(s)
     return yhat, yhat_details
@@ -295,7 +295,7 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY, y, X, theta, Options, poll_results=True)
+    yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY, y, X, theta, Options)
     
     # Return result(s)
     return yhat, yhat_details

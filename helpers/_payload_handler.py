@@ -212,7 +212,7 @@ def get_results(job_id:int, job_code:str):
         api_key, _ = _get_apikeys()
     
         # URL to REST API
-        url = 'https://api.csanalytics.io/v2/results'
+        url = 'https://api.csanalytics.io/v2/prediction-engine/results'
         
         header_obj = {
             'Content-Type': 'application/json',

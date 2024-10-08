@@ -220,7 +220,7 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
     
     # Print the response if it's not None and both job_id and job_code are None
     if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_ckt_inputs:{response}")
+        print(f"csanalytics:postmaster:_jobs:_post_grid_inputs:{response}")
     
     # Return results object
     return job_id, job_code
@@ -285,7 +285,7 @@ def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
     
     # Print the response if it's not None and both job_id and job_code are None
     if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_ckt_inputs:{response}")
+        print(f"csanalytics:postmaster:_jobs:_post_grid_inputs:{response}")
     
     # Return results object
     return job_id, job_code
