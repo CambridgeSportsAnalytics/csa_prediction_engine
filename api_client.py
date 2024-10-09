@@ -49,6 +49,7 @@ For support, please contact: support@csanalytics.io
 
 # Third-party imports
 from numpy import ndarray
+import time
 
 # Local application/library specific imports
 from .helpers import (
@@ -66,6 +67,7 @@ from csa_common_lib.classes.prediction_options import (
 # Importing enumerations from the common library
 from csa_common_lib.enum_types.functions import PSRFunction  # Function type enumeration
 from csa_common_lib.enum_types.job_types import JobType      # Job type enumeration
+from csa_common_lib.classes.prediction_receipt import PredictionReceipt # Receipts class
 
 # Importing single prediction task modules
 from .bin import single_tasks # Module for single task predictions
@@ -84,7 +86,7 @@ _TASK_MAP = {
 }
 
 
-def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
+def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, is_return_receipt:bool=False):
     """
     Calculates partial sample regression predictions based on relevance
     using the CSA API. 
@@ -128,16 +130,32 @@ def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions):
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+
+    # Start time for prediction 
+    start_time = time.time()
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
     yhat, yhat_details = prediction_function(PSRFunction.PSR, y, X, theta, Options)
     
-    # Return result(s)
-    return yhat, yhat_details
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditionla return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.PSR, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
     
     
-def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions):
+def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, is_return_receipt:bool=False):
     """
     Performs a relevance-based maxfit prediction using the CSA API.
 
@@ -183,16 +201,32 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions):
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+
+    # Start time for prediction 
+    start_time = time.time()
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
     yhat, yhat_details = prediction_function(PSRFunction.MAXFIT, y, X, theta, Options)
     
-    # Return result(s)
-    return yhat, yhat_details
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditionla return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.MAXFIT, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
 
 
-def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions):
+def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
     """
     Performs a relevance-based grid prediction using the CSA API.
 
@@ -238,16 +272,32 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions):
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+
+    # Start time for prediction 
+    start_time = time.time()
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
     yhat, yhat_details = prediction_function(PSRFunction.GRID, y, X, theta, Options)
     
-    # Return result(s)
-    return yhat, yhat_details
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditionla return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.GRID, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
 
 
-def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions):
+def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
     """
     Performs a relevance-based grid prediction using the CSA API.
 
@@ -292,10 +342,26 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+
+    # Start time for prediction 
+    start_time = time.time()
     
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
     yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY, y, X, theta, Options)
+
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditionla return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.GRID_SINGULARITY, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
     
-    # Return result(s)
-    return yhat, yhat_details
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
