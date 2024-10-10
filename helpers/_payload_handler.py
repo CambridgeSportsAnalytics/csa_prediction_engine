@@ -115,7 +115,7 @@ def post_job(function_type:PSRFunction, **varargin):
         int(PSRFunction.PSR): 'https://api.csanalytics.io/v2/prediction-engine/psr',
         int(PSRFunction.MAXFIT): 'https://api.csanalytics.io/v2/prediction-engine/maxfit',
         int(PSRFunction.GRID): 'https://api.csanalytics.io/v2/prediction-engine/grid',
-        int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid_singularity',
+        int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid-singularity',
         int(PSRFunction.RELEVANCE): 'https://api.csanalytics.io/v2/engine/relevance',
         int(PSRFunction.SIMILARITY): 'https://api.csanalytics.io/v2/engine/similarity',
         int(PSRFunction.INFORMATIVENESS): 'https://api.csanalytics.io/v2/engine/informativeness',
