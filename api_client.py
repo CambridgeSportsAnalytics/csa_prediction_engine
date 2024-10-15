@@ -365,3 +365,8 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     else:
          # Else, maintain normal return structure
          return yhat, yhat_details
+    
+
+def get_api_quota(quota_type:str="summary", api_key:str=None):
+
+    return _postmaster._get_quota(quota_type=quota_type, api_key=api_key)

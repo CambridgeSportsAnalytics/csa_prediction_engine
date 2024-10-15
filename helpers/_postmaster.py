@@ -28,11 +28,12 @@ Functions Overview
 support@csanalytics.io
 """
 
+import os
 
 from csa_prediction_engine.helpers._payload_handler import (
     post_job, 
     poll_for_results,
-    # _get_grid_max_limit as ckt_max_variables
+    get_quota
 )
 
 # Utlity function for processing ndarrays withing dictionaries
@@ -325,3 +326,10 @@ def _get_results(job_id: int, job_code:str):
         
     # Return results
     return yhat, output_details
+
+def _get_quota(quota_type:str='summary', api_key:str=None):
+    
+    if api_key is None: 
+        api_key = os.getenv('CSA_API_KEY')
+    
+    return get_quota(quota_type=quota_type, api_key=api_key)

@@ -185,6 +185,30 @@ def post_job(function_type:PSRFunction, **varargin):
     # Return the response
     return payload, job_id, job_code
 
+def get_quota(quota_type:str, api_key:str):
+    
+    quota_endpoints = {
+        'quota':'https://api.csanalytics.io/v2/prediction-engine/quota',
+        'used':'https://api.csanalytics.io/v2/prediction-engine/quota/used',
+        'remaining':'https://api.csanalytics.io/v2/prediction-engine/quota/remaining',
+        'summary':'https://api.csanalytics.io/v2/prediction-engine/quota/summary'
+    }
+
+    # Configure the header object
+    header_obj = {
+        'Content-Type': 'application/json',
+        'Connection': 'keep-alive',
+        'x-api-key': api_key
+    }
+
+    try:
+        url = quota_endpoints[quota_type]
+    except Exception as e:
+        raise Exception(f"User passed quota type does not exist. Please select quota, user, remaining or summary. Error {e}")
+    
+    response = requests.get(url=url, headers=header_obj)
+
+    return response.json()
 
 def get_results(job_id:int, job_code:str):
     """Retrieve results for a given job_id from server
