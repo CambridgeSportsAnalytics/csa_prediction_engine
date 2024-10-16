@@ -343,8 +343,8 @@ def _get_quota(quota_type:str='summary', api_key:str=None):
     dict
         json response body containing data for the selected quota_type
     """
-    
+
     if api_key is None: 
-        api_key, _ = _get_apikeys()
+        api_key, _ = _get_apikeys() # Retreive api keys from os environment variables
     
     return get_quota(quota_type=quota_type, api_key=api_key)
