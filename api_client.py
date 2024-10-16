@@ -368,5 +368,21 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     
 
 def get_api_quota(quota_type:str="summary", api_key:str=None):
+    """Returns a json response body containing data for the selected
+    quota_type.
+
+    Parameters
+    ----------
+    quota_type : str, optional
+        Select between "summary", "used", "remaining" or "quota". By default "summary"
+    api_key : str, optional
+        CSA_API_KEY, by default None. If not supplied, the function will search for CSA_API_KEY
+        in the the os environment variables.
+
+    Returns
+    -------
+    dict
+        json response body containing data for the selected quota_type
+    """
 
     return _postmaster._get_quota(quota_type=quota_type, api_key=api_key)

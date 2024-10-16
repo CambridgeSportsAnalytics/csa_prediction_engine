@@ -28,8 +28,7 @@ Functions Overview
 support@csanalytics.io
 """
 
-import os
-
+from csa_prediction_engine.helpers._auth_manager import _get_apikeys
 from csa_prediction_engine.helpers._payload_handler import (
     post_job, 
     poll_for_results,
@@ -328,8 +327,24 @@ def _get_results(job_id: int, job_code:str):
     return yhat, output_details
 
 def _get_quota(quota_type:str='summary', api_key:str=None):
+    """Returns a json response body containing data for the selected
+    quota_type.
+
+    Parameters
+    ----------
+    quota_type : str, optional
+        Select between "summary", "used", "remaining" or "quota". By default "summary"
+    api_key : str, optional
+        CSA_API_KEY, by default None. If not supplied, the function will search for CSA_API_KEY
+        in the the os environment variables.
+
+    Returns
+    -------
+    dict
+        json response body containing data for the selected quota_type
+    """
     
     if api_key is None: 
-        api_key = os.getenv('CSA_API_KEY')
+        api_key, _ = _get_apikeys()
     
     return get_quota(quota_type=quota_type, api_key=api_key)
