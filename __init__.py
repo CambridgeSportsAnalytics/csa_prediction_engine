@@ -48,27 +48,37 @@ For support, contact: support@csanalytics.io
 # Version information
 from .version import __version__
 
-# Enumeration types
-from csa_common_lib.enum_types.functions import PSRFunction
-from csa_common_lib.enum_types.results import PSRResult
-# from csa_common_lib.enum_types.exit_flags import PSRStatus # commented out bc does not exist at the moment
+# # Enumeration types
+# from csa_common_lib.enum_types.functions import PSRFunction
+# from csa_common_lib.enum_types.results import PSRResult
+# # from csa_common_lib.enum_types.exit_flags import PSRStatus # commented out bc does not exist at the moment
 
-# Classes
-from csa_common_lib.classes.prediction_options import (
-    PredictionOptions,
-    MaxFitOptions,
-    GridOptions
-)
+try:
+  # csa_common_lib imports
+  from csa_common_lib.classes.prediction_options import (
+      PredictionOptions,
+      MaxFitOptions,
+      GridOptions
+  )
+
+  # Prediction receipts and results classes
+  from csa_common_lib.classes.prediction_results import PredictionResults
+  from csa_common_lib.classes.prediction_receipt import PredictionReceipt
+  # Validators
+  from csa_common_lib.toolbox._validate import (
+      is_full_rank,
+      validate_inputs
+  )
+# Raise Error if imports fail
+except Exception as e:
+  raise Exception(f"csa_prediction_engine requires csa_common_lib. Please pip install or update csa_common_lib to use this package. Error:{e}")
+
 # End-points
 from .api_client import (
     predict_psr,
     predict_maxfit,
     predict_grid,
-    predict_grid_singularity
+    predict_grid_singularity,
+    get_api_quota
 )
 
-# Validatators
-from csa_common_lib.toolbox._validate import (
-    is_full_rank,
-    validate_inputs
-)
