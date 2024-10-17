@@ -50,6 +50,7 @@ support@csanalytics.io
 """
 
 # Standard library imports
+import sys
 import time  # Time-related functions
 import json  # JSON encoding and decoding
 import threading  # Support for multi-threaded programming
@@ -310,11 +311,11 @@ def _construct(**data):
             
         
     # Convert the payload to a JSON string
-    payload = json.dumps(variables, indent=4)
+    payload = json.dumps(variables, indent=None)
     
     # Return the JSON payload string        
     return payload
-
+    
 
 def _deconstruct(json_payload:str):
     """Deconstructs (decodes) JSON payload.
