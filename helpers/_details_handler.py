@@ -62,7 +62,7 @@ def gather_scalars(output_details:list, detail_type:str):
     -------
     ndarray [N-by-1]
         Column vector of detail_type values as a result of 
-        CKT Grid optimizations. If no detail_type values are found, 
+        Grid optimizations. If no detail_type values are found, 
         returns None.
     """
     
@@ -105,7 +105,7 @@ def gather_column_vectors(output_details:list, detail_type:str):
     -------
     ndarray [N-by-1]
         Column vector of detail_type values as a result of 
-        CKT Grid optimizations. If no detail_type values are found, 
+        Grid optimizations. If no detail_type values are found, 
         returns None.
     """
     
@@ -145,7 +145,7 @@ def gather_row_vectors(output_details:list, detail_type:str):
     -------
     ndarray [N-by-1]
         Column vector of detail_type values as a result of 
-        CKT Grid optimizations. If no detail_type values are found, 
+        Grid optimizations. If no detail_type values are found, 
         returns None.
     """
     
