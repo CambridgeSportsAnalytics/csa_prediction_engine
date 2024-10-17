@@ -164,7 +164,7 @@ def _post_maxfit_inputs(y, X, theta, Options:MaxFitOptions):
 def _post_grid_inputs(y, X, theta, Options:GridOptions):
     """ Runs and evaluates a prediction using the partial sample regression 
     model and solves for maximum adjusted fit with optimal variable selection. 
-    This is also known as the CKT optimal partial sample regression.
+    This is also known as the grid optimal partial sample regression.
     Returns yhat and model details.
     
 
@@ -210,7 +210,7 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
     # Retrieve Options dictionary and convert any ndarrays to lists
     options_dict = convert_ndarray_to_list(Options.options)
 
-    # Post the CKT job and let the server compute everything
+    # Post the grid prediction job and let the server compute everything
     response, job_id, job_code = post_job(
         PSRFunction.GRID,
         y=y,
@@ -227,9 +227,9 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
 
 
 def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
-    """ Runs and evaluates a prediction using the partial sample regression 
-    model and solves for maximum adjusted fit with optimal variable selection. 
-    This is also known as the CKT optimal partial sample regression.
+    """ Runs and evaluates a grid singularity prediction using the 
+    partial sample regression model and solves for maximum adjusted 
+    fit with optimal variable selection.
     Returns yhat and model details.
     
 
@@ -275,7 +275,7 @@ def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
     # Retrieve Options dictionary and convert any ndarrays to lists
     options_dict = convert_ndarray_to_list(Options.options)
     
-    # Post the CKT job and let the server compute everything
+    # Post the grid singularity job and let the server compute everything
     response, job_id, job_code = post_job(
         PSRFunction.GRID_SINGULARITY,
         y=y,
