@@ -65,6 +65,7 @@ from ._auth_manager import _get_apikeys  # Retrieve API keys for authentication
 from csa_common_lib.toolbox._validate import validate_inputs  # Input validation
 from csa_common_lib.toolbox import _notifier  # Sending notifications
 from csa_common_lib.enum_types.functions import PSRFunction  # Enum for function types
+from csa_common_lib.classes.float32_encoder import Float32Encoder
 
 
 # Global variables
@@ -117,12 +118,10 @@ def post_job(function_type:PSRFunction, **varargin):
         int(PSRFunction.MAXFIT): 'https://api.csanalytics.io/v2/prediction-engine/maxfit',
         int(PSRFunction.GRID): 'https://api.csanalytics.io/v2/prediction-engine/grid',
         int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid-singularity',
-        int(PSRFunction.RELEVANCE): 'https://api.csanalytics.io/v2/engine/relevance',
-        int(PSRFunction.SIMILARITY): 'https://api.csanalytics.io/v2/engine/similarity',
-        int(PSRFunction.INFORMATIVENESS): 'https://api.csanalytics.io/v2/engine/informativeness',
-        int(PSRFunction.FIT): 'https://api.csanalytics.io/v2/engine/fit',
-        int(PSRFunction.ADJUSTED_FIT): 'https://api.csanalytics.io/v2/engine/adjusted-fit',
-        int(PSRFunction.ASYMMETRY):'https://api.csanalytics.io/v2/engine/asymmetry'
+        int(PSRFunction.PSR_BINARY): 'https://api.csanalytics.io/v2/prediction-engine/psr/binary',
+        int(PSRFunction.MAXFIT_BINARY): 'https://api.csanalytics.io/v2/prediction-engine/maxfit/binary',
+        int(PSRFunction.GRID_BINARY): 'https://api.csanalytics.io/v2/prediction-engine/grid/binary',
+        int(PSRFunction.GRID_SINGULARITY_BINARY): 'https://api.csanalytics.io/v2/prediction-engine/grid-singularity/binary'
     }
     
     # Set the API end-point
@@ -311,7 +310,7 @@ def _construct(**data):
             
         
     # Convert the payload to a JSON string
-    payload = json.dumps(variables, indent=None)
+    payload = json.dumps(variables, indent=None, separators=(',', ':'), cls=Float32Encoder)
     
     # Return the JSON payload string        
     return payload
