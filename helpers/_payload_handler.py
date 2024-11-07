@@ -71,7 +71,6 @@ from csa_common_lib.helpers._os import calc_crc64
 from csa_common_lib.helpers._conversions import (
         convert_ndarray_to_list
     ) 
-from csa_common_lib.classes.float32_encoder import Float32Encoder
 
 
 # Global variables
