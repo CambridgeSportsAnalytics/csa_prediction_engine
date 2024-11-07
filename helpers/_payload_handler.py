@@ -70,6 +70,7 @@ from csa_common_lib.helpers._os import calc_crc64
 from csa_common_lib.helpers._conversions import (
         convert_ndarray_to_list
     ) 
+from csa_common_lib.classes.float32_encoder import Float32Encoder
 
 
 # Global variables
@@ -122,6 +123,12 @@ def post_job(function_type:PSRFunction, **varargin):
         int(PSRFunction.MAXFIT): 'https://api.csanalytics.io/v2/prediction-engine/maxfit',
         int(PSRFunction.GRID): 'https://api.csanalytics.io/v2/prediction-engine/grid',
         int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid-singularity',
+        int(PSRFunction.RELEVANCE): 'https://api.csanalytics.io/v2/engine/relevance',
+        int(PSRFunction.SIMILARITY): 'https://api.csanalytics.io/v2/engine/similarity',
+        int(PSRFunction.INFORMATIVENESS): 'https://api.csanalytics.io/v2/engine/informativeness',
+        int(PSRFunction.FIT): 'https://api.csanalytics.io/v2/engine/fit',
+        int(PSRFunction.ADJUSTED_FIT): 'https://api.csanalytics.io/v2/engine/adjusted-fit',
+        int(PSRFunction.ASYMMETRY):'https://api.csanalytics.io/v2/engine/asymmetry'
     }
     
     # Set the API end-point
@@ -310,7 +317,7 @@ def _construct(**data):
             
         
     # Convert the payload to a JSON string
-    payload = json.dumps(variables, indent=None)
+    payload = json.dumps(variables, indent=None, separators=(',', ':'), cls=Float32Encoder)
     
     # Return the JSON payload string        
     return payload
