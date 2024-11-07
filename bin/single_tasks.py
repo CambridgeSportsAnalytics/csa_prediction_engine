@@ -33,6 +33,7 @@ from csa_common_lib.classes.prediction_options import (
     GridOptions
 )
 from csa_common_lib.classes.prediction_receipt import PredictionReceipt
+from csa_prediction_engine.helpers._payload_handler import route_X_input
 
 # Import single prediction workers
 from ._workers import (
@@ -83,6 +84,9 @@ def predict(model_type:PSRFunction, y, X, theta, Options:PredictionOptions):
     # Get the corresponding dispatcher function
     dispatcher = _DISPATCHER_MAP.get(model_type)
     
+    # Route X input matrix depending on payload size
+    X = route_X_input(model_type=model_type, y=y, X=X, theta=theta, Options=Options)
+
     # Call the dispatcher function with the provided arguments
     yhat, yhat_details = dispatcher(y=y, X=X, theta=theta, Options=Options, poll_results=True)
     

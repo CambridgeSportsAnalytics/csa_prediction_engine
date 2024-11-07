@@ -54,6 +54,7 @@ import sys
 import time  # Time-related functions
 import json  # JSON encoding and decoding
 import threading  # Support for multi-threaded programming
+import os # Allows access to env variables
 
 # Third-party library imports
 import numpy as np  # Numerical operations and array manipulations
@@ -65,6 +66,10 @@ from ._auth_manager import _get_apikeys  # Retrieve API keys for authentication
 from csa_common_lib.toolbox._validate import validate_inputs  # Input validation
 from csa_common_lib.toolbox import _notifier  # Sending notifications
 from csa_common_lib.enum_types.functions import PSRFunction  # Enum for function types
+from csa_common_lib.helpers._os import calc_crc64
+from csa_common_lib.helpers._conversions import (
+        convert_ndarray_to_list
+    ) 
 
 
 # Global variables
@@ -117,12 +122,6 @@ def post_job(function_type:PSRFunction, **varargin):
         int(PSRFunction.MAXFIT): 'https://api.csanalytics.io/v2/prediction-engine/maxfit',
         int(PSRFunction.GRID): 'https://api.csanalytics.io/v2/prediction-engine/grid',
         int(PSRFunction.GRID_SINGULARITY): 'https://api.csanalytics.io/v2/prediction-engine/grid-singularity',
-        int(PSRFunction.RELEVANCE): 'https://api.csanalytics.io/v2/engine/relevance',
-        int(PSRFunction.SIMILARITY): 'https://api.csanalytics.io/v2/engine/similarity',
-        int(PSRFunction.INFORMATIVENESS): 'https://api.csanalytics.io/v2/engine/informativeness',
-        int(PSRFunction.FIT): 'https://api.csanalytics.io/v2/engine/fit',
-        int(PSRFunction.ADJUSTED_FIT): 'https://api.csanalytics.io/v2/engine/adjusted-fit',
-        int(PSRFunction.ASYMMETRY):'https://api.csanalytics.io/v2/engine/asymmetry'
     }
     
     # Set the API end-point
@@ -433,3 +432,94 @@ def _indeterminant_progress_thread(status_msg:str=None):
     # The thread has stopped, reset
     _notifier.show_cursor()
     _stop_notify_progress = False
+
+
+def route_X_input(model_type, y, X, theta, Options):
+    """Uploads X to s3 and returns a reference <checksum>.json file name
+    to be retreived by post job. Only runs when payloads are larger than 9.5mb
+
+    Parameters
+    ----------
+    model_type : PSRFunction
+        Type of prediction model (PSR, MAXFIT, GRID, or GRID_SINGULARITY).
+    y : ndarray [N-by-1]
+        Matrix of Q-column vectors of the dependent variable (prediction tasks).
+    X : ndarray [N-by-K]
+        Matrix of independent variables.
+    theta : [1-by-K]
+        Row vector of circumstances.
+    Options : PredictionOptions
+        Base class object containing all optional inputs.
+        Use MaxFitOptions and GridOptions where applicable (inherits
+        from PredictionOptions).
+
+    Returns
+    -------
+    X : ndarray or str
+        If payload is sufficiently large, will return an s3 file reference. Otherwise, 
+        returns the original X matrix and s3 is not used.  
+
+    Raises
+    ------
+    Exception
+        _description_
+    """
+
+    inputs = {
+            'y': y,
+            'X': X,
+            'theta':theta
+        }
+    
+    # validate X here
+    validate_inputs(is_strict=False, function_type=model_type, **inputs)
+    
+    # Mimic single theta api call to determine payload size (in mb)
+    payload = _construct(**inputs)
+
+    inputs['options'] = convert_ndarray_to_list(Options.options)
+
+    # Get payload size
+    payload_size_mb = sys.getsizeof(payload) / 1024 / 1024
+
+    # If payload is larger than 9.5mb, route X input matrix to s3 and send a reference
+    if payload_size_mb > 9.5:
+
+        try:
+            # Convert X matrix to json format
+            X_input = json.dumps(X.tolist(), indent=None, separators=(",",":"))
+
+            # Calculate checksum to be used as matrix reference
+            X_ref = calc_crc64(X_input.encode('utf-8'))
+
+            url = "https://api.csanalytics.io/v2/prediction-engine/payload/upload/url/X"
+
+            headers = {'x-api-key': os.getenv('CSA_API_KEY'),
+                    'Content-Type': 'application/json'}
+            
+            data = {
+                "file_name": f"{X_ref}.json"
+            }
+
+            # Initialize presigned_url to None and make the request for one
+            presigned_url = None
+            response = requests.get(url=url, data=json.dumps(data), headers=headers)
+
+            # If successful, extract presigned url from response
+            if response.status_code == 200:
+                presigned_url = response.json()['url']
+
+                # Upload X matrix as json to s3
+                response = requests.put(url=presigned_url, data=X_input, headers=headers)
+                if response.status_code in (200, 204):
+                    # Return reference as a json file name 
+                    reference = X_ref + '.json'
+                    return  reference
+                
+        except Exception as e:
+            raise Exception("Error routing X matrix to s3: ", str(e))
+    # Else, return original X input matrix since s3 is not being used. 
+    else:
+        return X
+
+        
