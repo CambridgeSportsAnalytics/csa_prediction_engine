@@ -156,7 +156,7 @@ def post_job(function_type:PSRFunction, **varargin):
     
     for attempt in range(_max_attempts):
         try:
-            response = requests.post(url, data=payload, headers=header_obj, timeout=300)
+            response = requests.post(url, data=payload, headers=header_obj, timeout=900)
             if response.status_code == HTTPStatus.OK:
                 # Successful response, break out of loop
                 break
@@ -492,7 +492,7 @@ def route_X_input(model_type, y, X, theta, Options):
 
         try:
             # Convert X matrix to json format
-            X_input = json.dumps(X.tolist(), indent=None, separators=(",",":"))
+            X_input = json.dumps(X.tolist(), indent=None, separators=(",",":"), cls=Float32Encoder)
 
             # Calculate checksum to be used as matrix reference
             X_ref = calc_crc64(X_input.encode('utf-8'))
