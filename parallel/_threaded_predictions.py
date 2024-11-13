@@ -98,7 +98,7 @@ def run_multi_y(model_type:PSRFunction, y_matrix:ndarray, X:ndarray, theta:ndarr
     start_time = time.time()
     
     # Route X input matrix depending on payload size
-    X = route_X_input(model_type=model_type, y=y_matrix[0], X=X, theta=theta, Options=Options)
+    X = route_X_input(model_type=model_type, y=y_matrix, X=X, theta=theta, Options=Options)
 
     # Prepare the single prediction task for PPSR
     inputs_for_post = [
@@ -166,7 +166,7 @@ def run_multi_theta(model_type:PSRFunction, y:ndarray, X:ndarray, theta_matrix:n
     start_time = time.time()
 
     # Route X input matrix depending on payload size
-    X = route_X_input(model_type=model_type, y=y, X=X, theta=theta_matrix[0], Options=Options)
+    X = route_X_input(model_type=model_type, y=y, X=X, theta=theta_matrix, Options=Options)
            
     # Prepare the single prediction task stratified by circumstances (theta)
     inputs_for_post = [
