@@ -68,6 +68,7 @@ from csa_common_lib.toolbox import _notifier  # Sending notifications
 from csa_common_lib.enum_types.functions import PSRFunction  # Enum for function types
 from csa_common_lib.classes.float32_encoder import Float32Encoder
 from csa_common_lib.helpers._os import calc_crc64
+from csa_common_lib.enum_types import LambdaStatus
 from csa_common_lib.helpers._conversions import (
         convert_ndarray_to_list
     ) 
@@ -345,7 +346,7 @@ def _deconstruct(json_payload:str):
     return payload
 
 
-def poll_for_results(job_id:int, job_code:str, interval=10, timeout=900):
+def poll_for_results(job_id:int, job_code:str):
     """Polls server for results, this can take up to 15 minutes 
     depending on the task.
 
@@ -355,68 +356,24 @@ def poll_for_results(job_id:int, job_code:str, interval=10, timeout=900):
         Job identification number. Provided by the post_job response.
     job_code : str
         Job code, secondary identifier. Provided by the post_job response.
-    interval : int, optional
-        Interval to poll server, by default 10 seconds.
-        The minimum interval is 10 seconds.
-    timeout : int, optional
-        Maximum timeout, by default 900 seconds.
 
     Returns
     -------
     dict
         Results dictionary.
 
-    Raises
-    ------
-    TimeoutError
-        When maximum timeout reached.
     """    
     
-    
-    if _notifier.is_notifier_enabled():
-        # Use the global variable _stop_notify_progress
-        global _stop_notify_progress
-        
-        # Start indeterminant progress display
-        _notify_thread = threading.Thread(
-            target=_indeterminant_progress_thread,
-            args=('Retrieving results from server',)
-            )
-        _notify_thread.start()
-        
-    # Ensure that the minimum interval = 10 seconds
-    interval = max(interval, 10)
-    
-    # Initialize output
-    output = None
-    
-    start_time = time.time()
-    while True:
-        # Get results using your function
-        response, output = get_results(job_id, job_code)
-        
-        # Check if the result is ready
-        if output is not None:  # Or whatever condition means the result is ready
-            if output.get('statusMsg') == "PROCESSING":
-                # The server is still processing results...
-                pass
-            else:
-                if _notifier.is_notifier_enabled():
-                    _stop_notify_progress = True
-                    _notify_thread.join() 
-                return output
+    # Get results from db
+    response, output = get_results(job_id, job_code)
 
-        # Check if timeout has been reached
-        elapsed_time = time.time() - start_time
-        if elapsed_time > timeout:
-            if _notifier.is_notifier_enabled():
-                _stop_notify_progress = True
-                _notify_thread.join() 
-            raise TimeoutError("csanalytics: get_results: Polling timed out.")
-
-        # Sleep for 30 seconds before checking again
-        time.sleep(interval)
-    
+    # If the output has a status code for Processing, return the status tuple
+    if 'status_code' in output.keys():
+        if output['status_code'] == LambdaStatus.PROCESSING.value[0]:
+            output = LambdaStatus.PROCESSING.value
+            
+    return output
+   
        
         
 def _indeterminant_progress_thread(status_msg:str=None):
