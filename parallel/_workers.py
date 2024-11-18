@@ -258,7 +258,7 @@ def _get_results_worker(job_id:int, job_code:str):
     """    
     
     # Get the results from CSA API
-    thread_safe_print(f"Retrieving results for job_id {job_id}.", PRINT_LOCK)
+    #thread_safe_print(f"Retrieving results for job_id {job_id}.", PRINT_LOCK)
     yhat, output_details = _get_results(job_id, job_code)
     
     # Return results object
