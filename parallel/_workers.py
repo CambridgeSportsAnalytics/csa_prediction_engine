@@ -183,7 +183,10 @@ def _grid_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(f"Processing grid prediction task {q}", PRINT_LOCK)
+    thread_safe_print(
+        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
+        PRINT_LOCK
+    )
     
     # Call grid prediction for a single task and send inputs to CSA's API
     job_id, job_code = _post_grid_inputs(y=y, X=X, theta=theta, Options=Options)
