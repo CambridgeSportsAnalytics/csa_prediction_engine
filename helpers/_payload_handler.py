@@ -68,7 +68,7 @@ from csa_common_lib.toolbox import _notifier  # Sending notifications
 from csa_common_lib.enum_types.functions import PSRFunction  # Enum for function types
 from csa_common_lib.classes.float32_encoder import Float32Encoder
 from csa_common_lib.helpers._os import calc_crc64
-from csa_common_lib.enum_types import LambdaStatus
+from csa_common_lib.enum_types import LambdaStatus, LambdaError
 from csa_common_lib.helpers._conversions import (
         convert_ndarray_to_list
     ) 
@@ -368,9 +368,20 @@ def poll_for_results(job_id:int, job_code:str):
     response, output = get_results(job_id, job_code)
 
     # If the output has a status code for Processing, return the status tuple
-    if 'status_code' in output.keys():
-        if output['status_code'] == LambdaStatus.PROCESSING.value[0]:
-            output = LambdaStatus.PROCESSING.value
+    if 'status_code' in output.keys() and 'error_code' in output.keys():
+
+        status_code = output['status_code']
+        error_code = output['error_code']
+
+        logging_dictionary = {
+            'status':LambdaStatus.status_by_code(status_code)
+        }
+
+        # If an error occured, append it to the output dict
+        if error_code > 0:
+            logging_dictionary['error'] = LambdaError.error_by_code(error_code)
+        
+        return logging_dictionary
             
     return output
    

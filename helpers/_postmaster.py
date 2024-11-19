@@ -321,8 +321,9 @@ def _get_results(job_id: int, job_code:str):
         output_details = poll_for_results(job_id, job_code)
 
         # if output details is an error or status enum (tuple), set yhat = None
-        if isinstance(output_details, tuple):
+        if 'status' in output_details.keys():
             yhat = None
+            output_details['yhat'] = None
 
         else:
             # Initialize output
