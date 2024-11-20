@@ -369,19 +369,18 @@ def poll_for_results(job_id:int, job_code:str):
 
     # If the output has a status code for Processing, return the status tuple
     if 'status_code' in output.keys() and 'error_code' in output.keys():
-
+        
+        error_output = {}
         status_code = output['status_code']
         error_code = output['error_code']
 
-        logging_dictionary = {
-            'status':LambdaStatus.status_by_code(status_code)
-        }
-
         # If an error occured, append it to the output dict
         if error_code > 0:
-            logging_dictionary['error'] = LambdaError.error_by_code(error_code)
+            guru_prefix = " GURU MEDITATION ERROR: "
+            error_msg = LambdaError.error_by_code(error_code)[-1]
+            error_output['error'] = "#" + str(status_code) + str(error_code) + guru_prefix + error_msg
         
-        return logging_dictionary
+            return error_output
             
     return output
    

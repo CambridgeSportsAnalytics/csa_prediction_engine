@@ -320,14 +320,7 @@ def _get_results(job_id: int, job_code:str):
         # if successful, then query results for job_id after expected_eta elapsed
         output_details = poll_for_results(job_id, job_code)
 
-        # if output details is an error or status enum (tuple), set yhat = None
-        if 'status' in output_details.keys():
-            yhat = None
-            output_details['yhat'] = None
-
-        else:
-            # Initialize output
-            yhat = output_details.get('yhat')
+        yhat = output_details.get('yhat', None)
         
     # Return results
     return yhat, output_details
