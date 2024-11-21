@@ -92,7 +92,10 @@ def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(f"Processing partial sample regression prediction task {q}", PRINT_LOCK)
+    thread_safe_print(
+        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
+        PRINT_LOCK
+    )
     
     # Call relevance-based predict for a single task and send inputs to CSA's API
     job_id, job_code = _post_predict_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -138,7 +141,10 @@ def _maxfit_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(f"Processing maxfit prediction task {q}", PRINT_LOCK)
+    thread_safe_print(
+        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
+        PRINT_LOCK
+    )
 
     # Call maxfit prediction for a single task and send inputs to CSA's API
     job_id, job_code = _post_maxfit_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -231,7 +237,10 @@ def _grid_singularity_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(f"Processing grid singularity prediction task {q}", PRINT_LOCK)
+    thread_safe_print(
+        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
+        PRINT_LOCK
+    )
 
     # Call grid singularity for a single task and send inputs to CSA's API
     job_id, job_code = _post_grid_singularity_inputs(y=y, X=X, theta=theta, Options=Options)
