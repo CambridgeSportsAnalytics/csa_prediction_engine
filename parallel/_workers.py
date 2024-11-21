@@ -92,10 +92,7 @@ def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(
-        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
-        PRINT_LOCK
-    )
+    _worker_progress_printout(q, theta_matrix)
     
     # Call relevance-based predict for a single task and send inputs to CSA's API
     job_id, job_code = _post_predict_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -141,10 +138,7 @@ def _maxfit_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(
-        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
-        PRINT_LOCK
-    )
+    _worker_progress_printout(q, theta_matrix)
 
     # Call maxfit prediction for a single task and send inputs to CSA's API
     job_id, job_code = _post_maxfit_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -189,10 +183,7 @@ def _grid_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(
-        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
-        PRINT_LOCK
-    )
+    _worker_progress_printout(q, theta_matrix)
     
     # Call grid prediction for a single task and send inputs to CSA's API
     job_id, job_code = _post_grid_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -237,10 +228,7 @@ def _grid_singularity_worker(q:int, slice_type:str, y_matrix:ndarray,
     
     # Extract the relevant (pun-intended) y and theta vectors for a single task
     y, theta = slice_matrices(q, slice_type, y_matrix, theta_matrix, X)
-    thread_safe_print(
-        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
-        PRINT_LOCK
-    )
+    _worker_progress_printout(q, theta_matrix)
 
     # Call grid singularity for a single task and send inputs to CSA's API
     job_id, job_code = _post_grid_singularity_inputs(y=y, X=X, theta=theta, Options=Options)
@@ -275,3 +263,21 @@ def _get_results_worker(job_id:int, job_code:str):
     
     # Return results object
     return yhat, output_details
+
+
+def _worker_progress_printout(q:int, theta_matrix):
+    """Prints out progress updates to the user from the terminal
+
+    Parameters
+    ----------
+    q : int
+        Slice index counter, see also slice_type
+    theta_matrix : ndarray [1-by-K or Q-by-K]
+        Row vector or matrix of circumstances.
+        
+    """
+
+    thread_safe_print(
+        f"CSA Prediction Tasks: {q+1}/{theta_matrix.shape[0]} submitted; 0/{theta_matrix.shape[0]} processed; 0/{theta_matrix.shape[0]} failed; 0/{theta_matrix.shape[0]} retrieved.",
+        PRINT_LOCK
+    )
