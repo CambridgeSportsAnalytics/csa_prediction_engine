@@ -370,6 +370,7 @@ def poll_for_results(job_id:int, job_code:str):
     # If the output has a status code for Processing, return the status tuple
     if 'status_code' in output.keys() and 'error_code' in output.keys():
         
+        # Format error output
         error_output = {}
         status_code = output['status_code']
         error_code = output['error_code']
