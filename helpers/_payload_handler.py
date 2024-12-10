@@ -482,12 +482,23 @@ def route_X_input(model_type, y, X, theta, Options):
             if response.status_code == 200:
                 presigned_url = response.json()['url']
 
-                # Upload X matrix as json to s3
-                response = requests.put(url=presigned_url, data=X_input, headers=headers)
-                if response.status_code in (200, 204):
-                    # Return reference as a json file name 
-                    reference = X_ref + '.json'
-                    return  reference
+                if presigned_url:
+                    # Upload X matrix as json to s3
+                    response = requests.put(url=presigned_url, data=X_input, headers=headers)
+                    if response.status_code in (200, 204):
+                        # Return reference as a json file name 
+                        reference = X_ref + '.json'
+                        return  reference
+                    
+                    else:
+                        raise Exception(
+                            f"Failed to upload X matrix to S3. Status code: {response.status_code}, Response: {response.text}"
+                        )
+                else:
+                    raise Exception("Presigned URL missing from response.")
+            raise Exception(
+                f"Unable to post inputs using presigned URL. Status code: {response.status_code}, Response: {response.text}"
+    )
                 
         except Exception as e:
             raise Exception("Error routing X matrix to s3: ", str(e))
