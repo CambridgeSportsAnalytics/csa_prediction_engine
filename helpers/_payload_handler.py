@@ -455,8 +455,8 @@ def route_X_input(model_type, y, X, theta, Options):
     # Get payload size
     payload_size_mb = sys.getsizeof(payload) / 1024 / 1024
 
-    # If payload is larger than 9.5mb or a batch job of any kind, send to s3
-    if payload_size_mb > 9.5 or theta.shape[0] > 1 or y.shape[-1] > 1:
+    # If payload is larger than 5mb or a batch job of any kind, send to s3
+    if payload_size_mb > 5 or theta.shape[0] > 1 or y.shape[-1] > 1:
         
         try:
             # Convert X matrix to json format
