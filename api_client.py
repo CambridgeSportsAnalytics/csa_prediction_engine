@@ -275,7 +275,6 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_re
 
     # Start time for prediction 
     start_time = time.time()
-    
     # Get the function based on the task type and call it
     prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
     yhat, yhat_details = prediction_function(PSRFunction.GRID, y, X, theta, Options)

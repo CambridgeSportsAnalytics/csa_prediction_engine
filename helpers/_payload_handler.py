@@ -265,7 +265,9 @@ def get_results(job_id:int, job_code:str):
                 response = requests.get(url, data=payload, headers=header_obj, timeout=300)
                 if response.status_code == HTTPStatus.OK:
                     # Successful response, break out of loop
-                    break
+                    response_data = json.loads(response.text)
+                    if response_data.get('error_code', 0) > 0 or response_data.get('yhat', None) is not None:
+                        break
             except requests.exceptions.RequestException as e:
                 print(f"helpers:_payload_handler:get_job:Attempt {attempt+1} failed for job_id{job_id}: {e}")
                 continue
