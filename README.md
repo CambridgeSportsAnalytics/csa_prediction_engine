@@ -1,16 +1,27 @@
-# Cambridge Sports Analytics Relevance Engine
+# CSA Preddiction Engine
 [![PyPI version](https://img.shields.io/pypi/v/csa-prediction-engine.svg)](https://pypi.org/project/csa-prediction-engine/)
 [![Python Version](https://img.shields.io/badge/python-%20v3.11-blue)](https://github.com/CambridgeSportsAnalytics/prediction_engine)
 [![CodeFactor](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine/badge)](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine)
 [![Total Lines of Code](https://tokei.rs/b1/github/CambridgeSportsAnalytics/csa_prediction_engine?category=code)](https://github.com/CambridgeSportsAnalytics/csa_prediction_engine)
 
-Welcome to the **CSA Prediction Engine** package. This Python library provides a suite of tools and functions for performing relevance-based predictions using the Cambridge Sports Analytics (CSA) API. The package is designed to facilitate single and multi-task predictions, allowing for flexible model evaluation and experimentation.
+**CSA Prediction Engine** is the official Python package for interacting with the Cambridge Sports Analytics (CSA) Prediction Engine API. It enables users to run relevance-based predictions and manage job workflows with ease, whether for single models or concurrent tasks.
 
-## Package Structure
+
+## 🚀 Key Features
+
+- **Single Task Predictions**: Support for predictions with one dependent variable and one set of circumstances.
+- **Multi-y Predictions**: Perform predictions with multiple dependent variables and a single set of circumstances.
+- **Multi-theta Predictions**: Perform predictions with one dependent variable and multiple sets of circumstances.
+- **Relevance-Based Grid Predictions**: Generate optimal predictions by evaluating all thresholds and variable combinations.
+- **Grid Singularity Predictions**: Analyze grid predictions to find the singular optimal solution.
+- **MaxFit Predictions**: Find the best-fit model based on adjusted relevance.
+
+
+## 🧱 Package Structure
 
 The package is structured as follows:
 
-```
+```bash
 csa_prediction_engine/
     ├── api_client.py                # Main module for user interactions
     ├── bin/                         # Internal modules for task management
@@ -29,28 +40,24 @@ csa_prediction_engine/
     └── __init__.py                  # Package initialization
 ```
 
-## Key Features
 
-- **Single Task Predictions**: Support for predictions with one dependent variable and one set of circumstances.
-- **Multi-y Predictions**: Perform predictions with multiple dependent variables and a single set of circumstances.
-- **Multi-theta Predictions**: Perform predictions with one dependent variable and multiple sets of circumstances.
-- **Relevance-Based Grid Predictions**: Generate optimal predictions by evaluating all thresholds and variable combinations.
-- **Grid Singularity Predictions**: Analyze grid predictions to find the singular optimal solution.
-- **MaxFit Predictions**: Find the best-fit model based on adjusted relevance.
+## 📦 Installation
 
-## Installation
-
-To install the CSAnalytics Prediction Engine package, use the following command:
+Install from PyPI:
 
 ```bash
 pip install csa_prediction_engine
 ```
+Requires Python 3.11.
 
-For more advanced usage and examples, refer to the documentation (link to detailed docs if available).
+## 📘 Documentation & Examples
+
+For OpenAPI specs, quickstart examples, and dev tutorials, visit:
+👉 [prediction_engine](https://github.com/CambridgeSportsAnalytics/prediction_engine)
 
 ## Contributing
 
-We welcome contributions to the CSA Relevance Engine package. If you find a bug or have a feature request, please reach out to the CSA support team: support@csanalytics.io
+Bug reports and feature requests are welcome. Reach out to our team support@csanalytics.io
 
 ## License
 
