@@ -50,4 +50,4 @@ We welcome contributions to the CSA Relevance Engine package. If you find a bug 
 
 ## License
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
