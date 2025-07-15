@@ -53,7 +53,7 @@ Requires Python 3.11.
 ## 📘 Documentation & Examples
 
 For OpenAPI specs, quickstart examples, and dev tutorials, visit:
-👉 [prediction_engine](https://github.com/CambridgeSportsAnalytics/prediction_engine)
+👉 [prediction_engine quickstart](https://github.com/CambridgeSportsAnalytics/prediction_engine_quickstart)
 
 ## 🤝 Contributing
 
