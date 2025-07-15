@@ -22,22 +22,22 @@
 The package is structured as follows:
 
 ```bash
-csa_prediction_engine/
-    ├── api_client.py                # Main module for user interactions
-    ├── bin/                         # Internal modules for task management
-    │   ├── _workers.py              # Executes various single prediction models
-    │   └── single_tasks.py          # Handles single task predictions
-    ├── helpers/                     # Helper modules for internal operations
-    │   ├── _auth_manager.py         # Manages authentication for API access
-    │   ├── _details_handler.py      # Manages retrieval and storage of model details
-    │   ├── _payload_handler.py      # Manages API payload construction and processing
-    │   ├── _postmaster.py           # Manages internal communications
-    │   └── _router.py               # Routes tasks based on input configurations
-    ├── parallel/                    # Modules for parallel processing
-    │   ├── _dispatchers.py          # Dispatches tasks to workers
-    │   ├── _workers.py              # Executes parallel tasks
-    │   └── _threaded_predictions.py # Handles predictions in a multi-threaded environment
-    └── __init__.py                  # Package initialization
+.
+├── api_client.py                # Main module for user interactions
+├── bin/                         # Internal modules for task management
+│   ├── _workers.py              # Executes various single prediction models
+│   └── single_tasks.py          # Handles single task predictions
+├── helpers/                     # Helper modules for internal operations
+│   ├── _auth_manager.py         # Manages authentication for API access
+│   ├── _details_handler.py      # Manages retrieval and storage of model details
+│   ├── _payload_handler.py      # Manages API payload construction and processing
+│   ├── _postmaster.py           # Manages internal communications
+│   └── _router.py               # Routes tasks based on input configurations
+├── parallel/                    # Modules for parallel processing
+│   ├── _dispatchers.py          # Dispatches tasks to workers
+│   ├── _workers.py              # Executes parallel tasks
+│   └── _threaded_predictions.py # Handles predictions in a multi-threaded environment
+└── __init__.py                  # Package initialization
 ```
 
 
