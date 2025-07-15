@@ -1,4 +1,8 @@
 # Cambridge Sports Analytics Relevance Engine
+[![PyPI version](https://img.shields.io/pypi/v/csa-prediction-engine.svg)](https://pypi.org/project/csa-prediction-engine/)
+[![Python Version](https://img.shields.io/badge/python-%20v3.11-blue)](https://github.com/CambridgeSportsAnalytics/prediction_engine)
+[![CodeFactor](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine/badge)](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine)
+[![Total Lines of Code](https://tokei.rs/b1/github/CambridgeSportsAnalytics/csa_prediction_engine?category=code)](https://github.com/CambridgeSportsAnalytics/csa_prediction_engine)
 
 Welcome to the **CSA Prediction Engine** package. This Python library provides a suite of tools and functions for performing relevance-based predictions using the Cambridge Sports Analytics (CSA) API. The package is designed to facilitate single and multi-task predictions, allowing for flexible model evaluation and experimentation.
 
