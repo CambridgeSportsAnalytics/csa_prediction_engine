@@ -59,6 +59,6 @@ For OpenAPI specs, quickstart examples, and dev tutorials, visit:
 
 Bug reports and feature requests are welcome. Reach out to our team 📧 support@csanalytics.io
 
-## License
+## ⚖️ License
 
 (c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
