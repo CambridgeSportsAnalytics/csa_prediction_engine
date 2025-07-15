@@ -61,4 +61,4 @@ Bug reports and feature requests are welcome. Reach out to our team 📧 support
 
 ## ⚖️ License
 
-(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
+Copyright (c) 2023 - 2025 Cambridge Prediction Analytics, LLC. All rights reserved.
