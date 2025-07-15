@@ -55,9 +55,9 @@ Requires Python 3.11.
 For OpenAPI specs, quickstart examples, and dev tutorials, visit:
 👉 [prediction_engine](https://github.com/CambridgeSportsAnalytics/prediction_engine)
 
-## Contributing
+## 🤝 Contributing
 
-Bug reports and feature requests are welcome. Reach out to our team support@csanalytics.io
+Bug reports and feature requests are welcome. Reach out to our team 📧 support@csanalytics.io
 
 ## License
 
