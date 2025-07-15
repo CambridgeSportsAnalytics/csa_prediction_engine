@@ -490,7 +490,7 @@ def route_X_input(model_type, y, X, theta, Options):
                     if response.status_code in (200, 204):
                         # Return reference as a json file name 
                         reference = X_ref + '.json'
-                        return  reference
+                        return reference
                     
                     else:
                         raise Exception(
