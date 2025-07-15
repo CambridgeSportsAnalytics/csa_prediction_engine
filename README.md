@@ -53,7 +53,7 @@ Requires Python 3.11.
 ## 📘 Documentation & Examples
 
 For OpenAPI specs, quickstart examples, and dev tutorials, visit:
-👉 [the CSA Prediction_Engine Quickstart Guide](https://github.com/CambridgeSportsAnalytics/prediction_engine_quickstart)
+👉 [CSA Prediction_Engine Quickstart Guide](https://github.com/CambridgeSportsAnalytics/prediction_engine_quickstart)
 
 ## 🤝 Contributing
 
