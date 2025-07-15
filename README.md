@@ -46,7 +46,7 @@ csa_prediction_engine/
 Install from PyPI:
 
 ```bash
-pip install csa_prediction_engine
+pip install csa-prediction-engine
 ```
 Requires Python 3.11.
 
