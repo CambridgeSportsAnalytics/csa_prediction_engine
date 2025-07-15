@@ -22,7 +22,7 @@
 The package is structured as follows:
 
 ```bash
-.
+csa_prediction_engine/
 ├── api_client.py                # Main module for user interactions
 ├── bin/                         # Internal modules for task management
 │   ├── _workers.py              # Executes various single prediction models
