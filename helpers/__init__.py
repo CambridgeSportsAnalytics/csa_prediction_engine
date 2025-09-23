@@ -3,7 +3,7 @@ CSAnalytics Helper Functions
 
 These are internal library helper functions. 
 
-(c) 2023 Cambridge Sports Analytics, LLC
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC
 support@csanalytics.io
 
 """

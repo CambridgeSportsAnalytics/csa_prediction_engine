@@ -30,7 +30,7 @@ The end-user functions, such as `predict_grid` and `predict_maxfit`,
 call the internal threading logic to execute multiple prediction jobs 
 simultaneously. 
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 

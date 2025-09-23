@@ -41,7 +41,7 @@ Version Information
 -------------------
 - `__version__`: The current version of the CSA Relevance Engine package.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 For support, contact: support@csanalytics.io
 """
 

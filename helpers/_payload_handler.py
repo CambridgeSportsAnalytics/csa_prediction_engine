@@ -45,7 +45,7 @@ a prediction task, use `post_job()` with the appropriate function type
 and input parameters. To retrieve the results, use `get_results()` with 
 the job ID and job code returned from `post_job()`.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 

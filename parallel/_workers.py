@@ -16,7 +16,7 @@ The available worker functions include:
 For end-user use, please refer to the high-level functions provided 
 in the corresponding threaded_predictions module.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 

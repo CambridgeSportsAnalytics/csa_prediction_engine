@@ -24,7 +24,7 @@ Functions Overview
 - _get_results(job_id, job_code):
     Polls the CSA server for results based on a given job ID and job code.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 

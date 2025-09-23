@@ -35,7 +35,7 @@ array([[0.95],
 >>> gather_column_vectors(output_details, 'yhat_compound')
 array([[1.2, 3.4]])
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 

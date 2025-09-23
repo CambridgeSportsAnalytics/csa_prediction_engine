@@ -12,7 +12,7 @@ Available Dispatcher Functions:
     - dispatch_grid_task: Dispatches a Grid model prediction task to a worker.
     - dispatch_grid_singularity_task: Dispatches a singularity task for the Grid model.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 
