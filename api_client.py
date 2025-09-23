@@ -142,7 +142,7 @@ def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, 
     end_time = time.time()
     prediction_duration = end_time - start_time
 
-    # conditionla return structure so as to not alter working logic 
+    # conditional return structure so as to not alter working logic 
     if is_return_receipt:
         # Capture relevant input info and generate a receipt
         receipt = PredictionReceipt(model_type=PSRFunction.PSR, y=y, X=X, theta=theta, options=Options,
@@ -213,7 +213,7 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, i
     end_time = time.time()
     prediction_duration = end_time - start_time
 
-    # conditionla return structure so as to not alter working logic 
+    # conditional return structure so as to not alter working logic 
     if is_return_receipt:
         # Capture relevant input info and generate a receipt
         receipt = PredictionReceipt(model_type=PSRFunction.MAXFIT, y=y, X=X, theta=theta, options=Options,
@@ -283,7 +283,7 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_re
     end_time = time.time()
     prediction_duration = end_time - start_time
 
-    # conditionla return structure so as to not alter working logic 
+    # conditional return structure so as to not alter working logic 
     if is_return_receipt:
         # Capture relevant input info and generate a receipt
         receipt = PredictionReceipt(model_type=PSRFunction.GRID, y=y, X=X, theta=theta, options=Options,
@@ -299,7 +299,6 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_re
 def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
     """
     Performs a relevance-based grid prediction using the CSA API.
-
     This method determines the singularity of a grid prediction. 
     
     This function supports three types of prediction tasks:   
@@ -353,7 +352,7 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     end_time = time.time()
     prediction_duration = end_time - start_time
 
-    # conditionla return structure so as to not alter working logic 
+    # conditional return structure so as to not alter working logic 
     if is_return_receipt:
         # Capture relevant input info and generate a receipt
         receipt = PredictionReceipt(model_type=PSRFunction.GRID_SINGULARITY, y=y, X=X, theta=theta, options=Options,
@@ -364,6 +363,289 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     else:
          # Else, maintain normal return structure
          return yhat, yhat_details
+
+
+## BINARY FUNCTIONS
+
+def predict_psr_binary(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, is_return_receipt:bool=False):
+    """
+    Calculates partial sample regression predictions for categorical outcomes
+    based on relevance using the CSA API. 
+    
+    This function supports three types of prediction tasks:   
+    1. Single prediction task: A single dependent variable and a single set of circumstances.
+    2. Multi-y prediction task: Multiple dependent variables (y) with a single set of circumstances (theta). 
+    3. Multi-theta prediction task: A single dependent variable with multiple sets of circumstances (theta).
+
+    Note: Multi-y and multi-theta prediction tasks cannot be performed 
+    simultaneously. Ensure that your input dimensions are structured 
+    accordingly, i.e., you can loop through multiple calls to handle 
+    these cases separately.
+
+    Parameters
+    ----------
+    y : ndarray
+        Dependent variable(s) represented as either:
+        - Single task: Column vector [N-by-1].
+        - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
+    X : ndarray
+        Independent variables matrix of shape [N-by-K], where K is the number of features.
+    theta : ndarray
+        Circumstances represented as either:
+        - Single task: Row vector [1-by-K].
+        - Multi-theta task: Matrix [Q-by-K], where Q is the number of different sets of circumstances.
+    options : PredictionOptions
+        Configuration object containing key-value parameters required 
+        for the prediction task.
+
+    Returns
+    -------
+    yhat : ndarray
+        Predicted outcome(s) based on the input data and circumstances.
+    yhat_details : dict
+        Dictionary containing additional details about the prediction model and results.
+
+    Raises
+    ------
+    ValueError
+        If both multi-y and multi-theta are specified simultaneously, 
+        or if the dimensions of `y`, `X`, and `theta` are not compatible.
+    """
+
+    # Start time for prediction 
+    start_time = time.time()
+    
+    # Get the function based on the task type and call it
+    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
+    yhat, yhat_details = prediction_function(PSRFunction.PSR_BINARY, y, X, theta, Options)
+    
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditional return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.PSR_BINARY, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
+    
+    
+def predict_maxfit_binary(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, is_return_receipt:bool=False):
+    """
+    Performs a relevance-based maxfit prediction for categorical outcomes using the CSA API.
+
+    This method determines the optimal relevance-based prediction by 
+    evaluating adjusted fit across various thresholds for the input data. 
+    
+    This function supports three types of prediction tasks:   
+    1. Single prediction task: A single dependent variable and a single set of circumstances.
+    2. Multi-y prediction task: Multiple dependent variables (y) with a single set of circumstances (theta). 
+    3. Multi-theta prediction task: A single dependent variable with multiple sets of circumstances (theta).
+
+    Note: Multi-y and multi-theta prediction tasks cannot be performed 
+    simultaneously. Ensure that your input dimensions are structured 
+    accordingly, i.e., you can loop through multiple calls to handle 
+    these cases separately.
+
+    Parameters
+    ----------
+    y : ndarray
+        Dependent variable(s) represented as either:
+        - Single task: Column vector [N-by-1].
+        - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
+    X : np.ndarray
+        Independent variables matrix of shape [N-by-K], where K is the number of features.
+    theta : ndarray
+        Circumstances represented as either:
+        - Single task: Row vector [1-by-K].
+        - Multi-theta task: Matrix [Q-by-K], where Q is the number of different sets of circumstances.
+    options : MaxFitOptions
+        Configuration object containing key-value parameters required 
+        for the maxfit prediction task.
+
+    Returns
+    -------
+    yhat : ndarray
+        Predicted outcome(s) based on the input data and circumstances.
+    yhat_details : dict
+        Dictionary containing additional details about the prediction model and results.
+
+    Raises
+    ------
+    ValueError
+        If both multi-y and multi-theta are specified simultaneously, 
+        or if the dimensions of `y`, `X`, and `theta` are not compatible.
+    """
+
+    # Start time for prediction 
+    start_time = time.time()
+    
+    # Get the function based on the task type and call it
+    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
+    yhat, yhat_details = prediction_function(PSRFunction.MAXFIT_BINARY, y, X, theta, Options)
+    
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditional return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.MAXFIT_BINARY, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
+
+
+def predict_grid_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+    """
+    Performs a relevance-based grid prediction for categorical outcomes using the CSA API.
+
+    This method generates an optimal composite prediction by evaluating
+    all thresholds and all variable combinations for the input data. 
+    
+    This function supports three types of prediction tasks:   
+    1. Single prediction task: A single dependent variable and a single set of circumstances.
+    2. Multi-y prediction task: Multiple dependent variables (y) with a single set of circumstances (theta). 
+    3. Multi-theta prediction task: A single dependent variable with multiple sets of circumstances (theta).
+
+    Note: Multi-y and multi-theta prediction tasks cannot be performed 
+    simultaneously. Ensure that your input dimensions are structured 
+    accordingly, i.e., you can loop through multiple calls to handle 
+    these cases separately.
+
+    Parameters
+    ----------
+    y : ndarray
+        Dependent variable(s) represented as either:
+        - Single task: Column vector [N-by-1].
+        - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
+    X : ndarray
+        Independent variables matrix of shape [N-by-K], where K is the number of features.
+    theta : ndarray
+        Circumstances represented as either:
+        - Single task: Row vector [1-by-K].
+        - Multi-theta task: Matrix [Q-by-K], where Q is the number of different sets of circumstances.
+    options : GridOptions
+        Configuration object containing key-value parameters required 
+        for the grid prediction task.
+
+    Returns
+    -------
+    yhat : ndarray
+        Predicted outcome(s) based on the input data and circumstances.
+    yhat_details : dict
+        Dictionary containing additional details about the prediction model and results.
+
+    Raises
+    ------
+    ValueError
+        If both multi-y and multi-theta are specified simultaneously, 
+        or if the dimensions of `y`, `X`, and `theta` are not compatible.
+    """
+
+    # Start time for prediction 
+    start_time = time.time()
+    # Get the function based on the task type and call it
+    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
+    yhat, yhat_details = prediction_function(PSRFunction.GRID_BINARY, y, X, theta, Options)
+    
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditional return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.GRID_BINARY, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
+
+
+def predict_grid_singularity_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+    """
+    Performs a relevance-based grid prediction for categorical outcomesusing the CSA API.
+    This method determines the singularity of a grid prediction for categorical outcomes.
+    
+    This function supports three types of prediction tasks:   
+    1. Single prediction task: A single dependent variable and a single set of circumstances.
+    2. Multi-y prediction task: Multiple dependent variables (y) with a single set of circumstances (theta). 
+    3. Multi-theta prediction task: A single dependent variable with multiple sets of circumstances (theta).
+
+    Note: Multi-y and multi-theta prediction tasks cannot be performed 
+    simultaneously. Ensure that your input dimensions are structured 
+    accordingly, i.e., you can loop through multiple calls to handle 
+    these cases separately.
+
+    Parameters
+    ----------
+    y : ndarray
+        Dependent variable(s) represented as either:
+        - Single task: Column vector [N-by-1].
+        - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
+    X : ndarray
+        Independent variables matrix of shape [N-by-K], where K is the number of features.
+    theta : ndarray
+        Circumstances represented as either:
+        - Single task: Row vector [1-by-K].
+        - Multi-theta task: Matrix [Q-by-K], where Q is the number of different sets of circumstances.
+    options : GridOptions
+        Configuration object containing key-value parameters required 
+        for the grid prediction task.
+
+    Returns
+    -------
+    yhat : ndarray
+        Predicted outcome(s) based on the input data and circumstances.
+    yhat_details : dict
+        Dictionary containing additional details about the prediction model and results.
+
+    Raises
+    ------
+    ValueError
+        If both multi-y and multi-theta are specified simultaneously, 
+        or if the dimensions of `y`, `X`, and `theta` are not compatible.
+    """
+
+    # Start time for prediction 
+    start_time = time.time()
+    
+    # Get the function based on the task type and call it
+    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
+    yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY_BINARY, y, X, theta, Options)
+
+    # Current time after prediction is complete
+    end_time = time.time()
+    prediction_duration = end_time - start_time
+
+    # conditional return structure so as to not alter working logic 
+    if is_return_receipt:
+        # Capture relevant input info and generate a receipt
+        receipt = PredictionReceipt(model_type=PSRFunction.GRID_SINGULARITY_BINARY, y=y, X=X, theta=theta, options=Options,
+                                    yhat=yhat, prediction_duration=prediction_duration)
+        # Return receipt in addition to yhat and yhat_details
+        return yhat, yhat_details, receipt
+    
+    else:
+         # Else, maintain normal return structure
+         return yhat, yhat_details
+
+## end
     
 
 def get_api_quota(quota_type:str="summary", api_key:str=None):
