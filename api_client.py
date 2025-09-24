@@ -43,13 +43,15 @@ Each function takes inputs in the form of NumPy arrays for `y`, `X`, and
 `theta`, and utilizes option classes (`PredictionOptions`, `MaxFitOptions`, 
 `GridOptions`) to configure the prediction task.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 For support, please contact: support@csanalytics.io
 """
 
 # Third-party imports
 from numpy import ndarray
 import time
+from typing import Union, Tuple, Dict, Any, Callable
+from functools import wraps
 
 # Local application/library specific imports
 from .helpers import (
@@ -86,7 +88,106 @@ _TASK_MAP = {
 }
 
 
-def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, is_return_receipt:bool=False):
+def _prediction_decorator(psr_function: PSRFunction):
+    """
+    Decorator that handles common prediction logic.
+    
+    This decorator extracts all the common logic from prediction functions,
+    including timing, task type determination, function routing, and receipt
+    generation, while maintaining clear, typed function signatures.
+    
+    Parameters
+    ----------
+    psr_function : PSRFunction
+        The PSR function type to use for this prediction.
+        
+    Returns
+    -------
+    Callable
+        A decorator function that wraps prediction functions.
+    """
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(
+            y: ndarray,
+            X: ndarray,
+            theta: ndarray,
+            options: Union[PredictionOptions, MaxFitOptions, GridOptions],
+            is_return_receipt: bool = False
+        ) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
+            """
+            Execute prediction with common logic handling.
+            
+            Parameters
+            ----------
+            y : ndarray
+                Dependent variable(s) represented as either:
+                - Single task: Column vector [N-by-1].
+                - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
+            X : ndarray
+                Independent variables matrix of shape [N-by-K], where K is the number of features.
+            theta : ndarray
+                Circumstances represented as either:
+                - Single task: Row vector [1-by-K].
+                - Multi-theta task: Matrix [Q-by-K], where Q is the number of different sets of circumstances.
+            options : Union[PredictionOptions, MaxFitOptions, GridOptions]
+                Configuration object containing key-value parameters required 
+                for the prediction task.
+            is_return_receipt : bool, optional
+                Whether to return a prediction receipt, by default False.
+                
+            Returns
+            -------
+            Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+                Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+                yhat : ndarray
+                    Predicted outcome(s) based on the input data and circumstances.
+                yhat_details : dict
+                    Dictionary containing additional details about the prediction model and results.
+            """
+            # Start time for prediction 
+            start_time = time.time()
+            
+            # Get the function based on the task type and call it
+            prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
+            yhat, yhat_details = prediction_function(psr_function, y, X, theta, options)
+            
+            # Current time after prediction is complete
+            end_time = time.time()
+            prediction_duration = end_time - start_time
+
+            # Conditional return structure so as to not alter working logic 
+            if is_return_receipt:
+                # Capture relevant input info and generate a receipt
+                receipt = PredictionReceipt(
+                    model_type=psr_function,
+                    y=y,
+                    X=X,
+                    theta=theta,
+                    options=options,
+                    yhat=yhat,
+                    prediction_duration=prediction_duration
+                )
+                # Return receipt in addition to yhat and yhat_details
+                return yhat, yhat_details, receipt
+            
+            else:
+                # Else, maintain normal return structure
+                return yhat, yhat_details
+        
+        return wrapper
+    return decorator
+
+
+# region Continuous Outcome Relevance-Based Prediction Functions
+@_prediction_decorator(PSRFunction.PSR)
+def predict_psr(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: PredictionOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Calculates partial sample regression predictions based on relevance
     using the CSA API. 
@@ -116,13 +217,17 @@ def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, 
     options : PredictionOptions
         Configuration object containing key-value parameters required 
         for the prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -130,32 +235,17 @@ def predict_psr(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, 
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+    pass  # Implementation handled by decorator
 
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.PSR, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
 
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.PSR, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
-    
-    
-def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.MAXFIT)
+def predict_maxfit(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: MaxFitOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Performs a relevance-based maxfit prediction using the CSA API.
 
@@ -178,7 +268,7 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, i
         Dependent variable(s) represented as either:
         - Single task: Column vector [N-by-1].
         - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
-    X : np.ndarray
+    X : ndarray
         Independent variables matrix of shape [N-by-K], where K is the number of features.
     theta : ndarray
         Circumstances represented as either:
@@ -187,13 +277,17 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, i
     options : MaxFitOptions
         Configuration object containing key-value parameters required 
         for the maxfit prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -201,32 +295,17 @@ def predict_maxfit(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, i
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
-
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.MAXFIT, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.MAXFIT, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
+    pass  # Implementation handled by decorator
 
 
-def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.GRID)
+def predict_grid(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: GridOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Performs a relevance-based grid prediction using the CSA API.
 
@@ -258,13 +337,17 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_re
     options : GridOptions
         Configuration object containing key-value parameters required 
         for the grid prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -272,33 +355,19 @@ def predict_grid(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_re
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
-
-    # Start time for prediction 
-    start_time = time.time()
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.GRID, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
+    pass  # Implementation handled by decorator
 
 
-def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.GRID_SINGULARITY)
+def predict_grid_singularity(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: GridOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
-    Performs a relevance-based grid prediction using the CSA API.
+    Performs a relevance-based grid singularity prediction using the CSA API.
     This method determines the singularity of a grid prediction. 
     
     This function supports three types of prediction tasks:   
@@ -326,13 +395,17 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
     options : GridOptions
         Configuration object containing key-value parameters required 
         for the grid prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -340,34 +413,19 @@ def predict_grid_singularity(y:ndarray, X:ndarray, theta:ndarray, Options:GridOp
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+    pass  # Implementation handled by decorator
 
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY, y, X, theta, Options)
+# endregion
 
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.GRID_SINGULARITY, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
-
-
-## BINARY FUNCTIONS
-
-def predict_psr_binary(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOptions, is_return_receipt:bool=False):
+# region Binary/Categorical Outcome Relevance-Based Prediction Functions
+@_prediction_decorator(PSRFunction.PSR_BINARY)
+def predict_psr_binary(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: PredictionOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Calculates partial sample regression predictions for categorical outcomes
     based on relevance using the CSA API. 
@@ -397,13 +455,18 @@ def predict_psr_binary(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOp
     options : PredictionOptions
         Configuration object containing key-value parameters required 
         for the prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
+
 
     Raises
     ------
@@ -411,32 +474,17 @@ def predict_psr_binary(y:ndarray, X:ndarray, theta:ndarray, Options:PredictionOp
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+    pass  # Implementation handled by decorator
 
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.PSR_BINARY, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
 
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.PSR_BINARY, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
-    
-    
-def predict_maxfit_binary(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.MAXFIT_BINARY)
+def predict_maxfit_binary(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: MaxFitOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Performs a relevance-based maxfit prediction for categorical outcomes using the CSA API.
 
@@ -459,7 +507,7 @@ def predict_maxfit_binary(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOpt
         Dependent variable(s) represented as either:
         - Single task: Column vector [N-by-1].
         - Multi-y task: Matrix [N-by-Q], where Q is the number of dependent variables.
-    X : np.ndarray
+    X : ndarray
         Independent variables matrix of shape [N-by-K], where K is the number of features.
     theta : ndarray
         Circumstances represented as either:
@@ -468,13 +516,17 @@ def predict_maxfit_binary(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOpt
     options : MaxFitOptions
         Configuration object containing key-value parameters required 
         for the maxfit prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -482,32 +534,17 @@ def predict_maxfit_binary(y:ndarray, X:ndarray, theta:ndarray, Options:MaxFitOpt
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
-
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.MAXFIT_BINARY, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.MAXFIT_BINARY, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
+    pass  # Implementation handled by decorator
 
 
-def predict_grid_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.GRID_BINARY)
+def predict_grid_binary(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: GridOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
     Performs a relevance-based grid prediction for categorical outcomes using the CSA API.
 
@@ -539,13 +576,17 @@ def predict_grid_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions
     options : GridOptions
         Configuration object containing key-value parameters required 
         for the grid prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -553,33 +594,20 @@ def predict_grid_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
-
-    # Start time for prediction 
-    start_time = time.time()
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID_BINARY, y, X, theta, Options)
-    
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.GRID_BINARY, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
+    pass  # Implementation handled by decorator
 
 
-def predict_grid_singularity_binary(y:ndarray, X:ndarray, theta:ndarray, Options:GridOptions, is_return_receipt:bool=False):
+@_prediction_decorator(PSRFunction.GRID_SINGULARITY_BINARY)
+def predict_grid_singularity_binary(
+    y: ndarray,
+    X: ndarray,
+    theta: ndarray,
+    options: GridOptions,
+    is_return_receipt: bool = False
+) -> Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]:
     """
-    Performs a relevance-based grid prediction for categorical outcomesusing the CSA API.
+    Performs a relevance-based grid singularity prediction for categorical outcomes using the CSA API.
+    
     This method determines the singularity of a grid prediction for categorical outcomes.
     
     This function supports three types of prediction tasks:   
@@ -607,13 +635,17 @@ def predict_grid_singularity_binary(y:ndarray, X:ndarray, theta:ndarray, Options
     options : GridOptions
         Configuration object containing key-value parameters required 
         for the grid prediction task.
+    is_return_receipt : bool, optional
+        Whether to return a prediction receipt, by default False.
 
     Returns
     -------
-    yhat : ndarray
-        Predicted outcome(s) based on the input data and circumstances.
-    yhat_details : dict
-        Dictionary containing additional details about the prediction model and results.
+    Union[Tuple[ndarray, Dict[str, Any]], Tuple[ndarray, Dict[str, Any], PredictionReceipt]]
+        Either (yhat, yhat_details) or (yhat, yhat_details, receipt) depending on is_return_receipt.
+        yhat : ndarray
+            Predicted outcome(s) based on the input data and circumstances.
+        yhat_details : dict
+            Dictionary containing additional details about the prediction model and results.
 
     Raises
     ------
@@ -621,36 +653,12 @@ def predict_grid_singularity_binary(y:ndarray, X:ndarray, theta:ndarray, Options
         If both multi-y and multi-theta are specified simultaneously, 
         or if the dimensions of `y`, `X`, and `theta` are not compatible.
     """
+    pass  # Implementation handled by decorator
 
-    # Start time for prediction 
-    start_time = time.time()
-    
-    # Get the function based on the task type and call it
-    prediction_function = _TASK_MAP.get(_router.determine_task_type(y, X, theta))
-    yhat, yhat_details = prediction_function(PSRFunction.GRID_SINGULARITY_BINARY, y, X, theta, Options)
 
-    # Current time after prediction is complete
-    end_time = time.time()
-    prediction_duration = end_time - start_time
-
-    # conditional return structure so as to not alter working logic 
-    if is_return_receipt:
-        # Capture relevant input info and generate a receipt
-        receipt = PredictionReceipt(model_type=PSRFunction.GRID_SINGULARITY_BINARY, y=y, X=X, theta=theta, options=Options,
-                                    yhat=yhat, prediction_duration=prediction_duration)
-        # Return receipt in addition to yhat and yhat_details
-        return yhat, yhat_details, receipt
-    
-    else:
-         # Else, maintain normal return structure
-         return yhat, yhat_details
-
-## end
-    
-
-def get_api_quota(quota_type:str="summary", api_key:str=None):
-    """Returns a json response body containing data for the selected
-    quota_type.
+def get_api_quota(quota_type: str = "summary", api_key: str = None) -> Dict[str, Any]:
+    """
+    Returns a json response body containing data for the selected quota_type.
 
     Parameters
     ----------
@@ -665,5 +673,4 @@ def get_api_quota(quota_type:str="summary", api_key:str=None):
     dict
         json response body containing data for the selected quota_type
     """
-
     return _postmaster._get_quota(quota_type=quota_type, api_key=api_key)
