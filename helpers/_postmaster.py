@@ -60,20 +60,9 @@ def _post_predict_inputs(y, X, theta, Options:PredictionOptions):
         Matrix of independent variables.
     theta : [1-by-K]
         Row vector of circumstances.
-    threshold : float or ndarray[1-by-T], optional (default=None)
-        Threshold to evaluate relevant observations.
-        If threshold=None, the model will evaluate across thresholds
-        from [0, 0.90) in 0.10 increments.
-    is_threshold_percent : bool, optional (default=True)
-        Specify whether threshold is in percentage (decimal) units.
-    most_eval : bool, optional (default=True)
-        Specify the direction of threshold evluation.
-        True:  relevance score > threshold
-        False: relevance score < threshold
-    eval_type : str, optional (default="relevance")
-        Specify the censor signal type, relevance or similarity.
-    cov_inv : ndarray [K-by-K], optional (default=None)
-        Inverse covariance matrix, specify for speed.
+    Options: PredictionOptions
+        Options class to organize and persist parameters used for the
+        partial sample regression prediction model.
 
     Returns
     -------
@@ -121,14 +110,9 @@ def _post_maxfit_inputs(y, X, theta, Options:MaxFitOptions):
         Matrix of independent variables.
     theta : [1-by-K]
         Row vector of circumstances.
-    most_eval : bool, optional (default=True)
-        Specify the direction of threshold evluation.
-        True:  relevance score > threshold
-        False: relevance score < threshold
-    eval_type : str, optional (default="relevance")
-        Specify the censor signal type, relevance or similarity.
-    cov_inv : ndarray [K-by-K], optional (default=None)
-        Inverse covariance matrix, specify for speed.
+    Options: MaxFitOptions
+        Options class to organize and persist parameters used for the
+        maximum fit prediction model.
 
     Returns
     -------
@@ -176,23 +160,9 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
         Matrix of independent variables.
     theta : [1-by-K]
         Row vector of circumstances.
-    threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0,1)
-    stepsize : float, optional (default=0.20)
-        Stepsize to evaluate range of thresholds to solve for max fit.
-        Decreasing stepsize will increase the granularity of the search.
-    most_eval : bool, optional (default=True)
-        Specify the direction of threshold evluation.
-        True:  relevance score > threshold
-        False: relevance score < threshold
-    eval_type : str, optional (default="all")
-        Specify the censor signal type, relevance, similarity, or all.
-    k : int, optional (default=None)
-        Lower bound for the number of variables to include, by default None.
-        None would be equivalent to an unconstraint optimization.
-    return_grid : boolean, optional (default=False)
-        Returns grid of adjusted_fits, yhats, and weights via output_details
-        for all the combinations evaluated.
+    Options: GridOptions
+        Options class to organize and persist parameters used for the
+        grid (and grid singularity) prediction model.
 
     Returns
     -------
@@ -241,23 +211,9 @@ def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
         Matrix of independent variables.
     theta : [1-by-K]
         Row vector of circumstances.
-    threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0,1)
-    stepsize : float, optional (default=0.20)
-        Stepsize to evaluate range of thresholds to solve for max fit.
-        Decreasing stepsize will increase the granularity of the search.
-    most_eval : bool, optional (default=True)
-        Specify the direction of threshold evluation.
-        True:  relevance score > threshold
-        False: relevance score < threshold
-    eval_type : str, optional (default="all")
-        Specify the censor signal type, relevance, similarity, or all.
-    k : int, optional (default=None)
-        Lower bound for the number of variables to include, by default None.
-        None would be equivalent to an unconstraint optimization.
-    return_grid : boolean, optional (default=False)
-        Returns grid of adjusted_fits, yhats, and weights via output_details
-        for all the combinations evaluated.
+    Options: GridOptions
+        Options class to organize and persist parameters used for the
+        grid (and grid singularity) prediction model.
 
     Returns
     -------
