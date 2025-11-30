@@ -2,7 +2,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/csa-prediction-engine.svg)](https://pypi.org/project/csa-prediction-engine/)
 [![Python Version](https://img.shields.io/badge/python-%20v3.11-blue)](https://github.com/CambridgeSportsAnalytics/prediction_engine)
 [![CodeFactor](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine/badge)](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_prediction_engine)
-[![Total Lines of Code](https://tokei.rs/b1/github/CambridgeSportsAnalytics/csa_prediction_engine?category=code)](https://github.com/CambridgeSportsAnalytics/csa_prediction_engine)
 
 **CSA Prediction Engine** is the official Python package for interacting with the Cambridge Sports Analytics (CSA) Prediction Engine API. It enables users to run relevance-based predictions and manage job workflows with ease, whether for single models or concurrent tasks.
 
