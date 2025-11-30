@@ -18,7 +18,7 @@ Usage:
 These functions send prediction jobs to the server, either waiting for results 
 synchronously (default) or returning a job ID and code for later polling.
 
-(c) 2023 - 2024 Cambridge Sports Analytics, LLC. All rights reserved.
+(c) 2023 - 2025 Cambridge Sports Analytics, LLC. All rights reserved.
 support@csanalytics.io
 """
 
@@ -40,7 +40,11 @@ from ._workers import (
     predict_grid,
     predict_grid_singularity,
     predict_maxfit,
-    predict_psr
+    predict_psr,
+    predict_grid_binary,
+    predict_grid_singularity_binary,
+    predict_maxfit_binary,
+    predict_psr_binary
 )
 
 # Dispatcher mapping based on PSRFunction type.
@@ -49,7 +53,11 @@ _DISPATCHER_MAP = {
     PSRFunction.GRID: predict_grid,
     PSRFunction.GRID_SINGULARITY: predict_grid_singularity,
     PSRFunction.MAXFIT: predict_maxfit,
-    PSRFunction.PSR: predict_psr
+    PSRFunction.PSR: predict_psr,
+    PSRFunction.GRID_BINARY: predict_grid_binary,
+    PSRFunction.GRID_SINGULARITY_BINARY: predict_grid_singularity_binary,
+    PSRFunction.MAXFIT_BINARY: predict_maxfit_binary,
+    PSRFunction.PSR_BINARY: predict_psr_binary,
 }
 
 

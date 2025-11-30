@@ -57,14 +57,14 @@ PRINT_LOCK = threading.Lock()
 
 
 def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray, 
-                    theta_matrix:ndarray, Options:PredictionOptions):
+                    theta_matrix:ndarray, Options:PredictionOptions, is_binary:bool=False):
     """
     Executes a single relevance-based prediction task.
 
     This function runs a single prediction task using the CSA API
     relevance-based model. It is executed as part of a multi-threaded workflow.
 
-    Parameter
+    Parameters
     ----------
     q : int
         Slice index counter, see also slice_type
@@ -80,7 +80,9 @@ def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
         Row vector or matrix of circumstances.
     Options : PredictionOptions
         Options object that contains the necessary key-value parameters
-        for grid predictions.
+        for predictions.
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
 
     Returns
     -------
@@ -95,7 +97,7 @@ def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
     _worker_progress_printout(q, theta_matrix)
     
     # Call relevance-based predict for a single task and send inputs to CSA's API
-    job_id, job_code = _post_predict_inputs(y=y, X=X, theta=theta, Options=Options)
+    job_id, job_code = _post_predict_inputs(y=y, X=X, theta=theta, Options=Options, is_binary=is_binary)
     
     # Return the job_id and job_code from the server
     return job_id, job_code
@@ -103,7 +105,7 @@ def _psr_predict_worker(q:int, slice_type:str, y_matrix:ndarray, X:ndarray,
 
 def _maxfit_predict_worker(q:int, slice_type:str, y_matrix:ndarray, 
                            X:ndarray, theta_matrix:ndarray, 
-                           Options:MaxFitOptions):
+                           Options:MaxFitOptions, is_binary:bool=False):
     """
     Executes a single maximum fit prediction task.
 
@@ -126,7 +128,9 @@ def _maxfit_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
         Row vector or matrix of circumstances.
     Options : MaxFitOptions
         Options object that contains the necessary key-value parameters
-        for grid predictions.
+        for maxfit predictions.
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
 
     Returns
     -------
@@ -141,14 +145,14 @@ def _maxfit_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     _worker_progress_printout(q, theta_matrix)
 
     # Call maxfit prediction for a single task and send inputs to CSA's API
-    job_id, job_code = _post_maxfit_inputs(y=y, X=X, theta=theta, Options=Options)
+    job_id, job_code = _post_maxfit_inputs(y=y, X=X, theta=theta, Options=Options, is_binary=is_binary)
     
     # Return the job_id and job_code from the server
     return job_id, job_code
 
 
 def _grid_predict_worker(q:int, slice_type:str, y_matrix:ndarray, 
-                         X:ndarray, theta_matrix:ndarray, Options:GridOptions):
+                         X:ndarray, theta_matrix:ndarray, Options:GridOptions, is_binary:bool=False):
     """
     Executes a single Grid model prediction task.
 
@@ -172,6 +176,8 @@ def _grid_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     Options : GridOptions
         Options object that contains the necessary key-value parameters
         for grid predictions.
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
 
     Returns
     -------
@@ -186,14 +192,14 @@ def _grid_predict_worker(q:int, slice_type:str, y_matrix:ndarray,
     _worker_progress_printout(q, theta_matrix)
     
     # Call grid prediction for a single task and send inputs to CSA's API
-    job_id, job_code = _post_grid_inputs(y=y, X=X, theta=theta, Options=Options)
+    job_id, job_code = _post_grid_inputs(y=y, X=X, theta=theta, Options=Options, is_binary=is_binary)
 
     # Return job_id and job_code
     return job_id, job_code
 
 
 def _grid_singularity_worker(q:int, slice_type:str, y_matrix:ndarray, 
-                             X:ndarray, theta_matrix:ndarray, Options:GridOptions):
+                             X:ndarray, theta_matrix:ndarray, Options:GridOptions, is_binary:bool=False):
     """
     Executes a single Grid Singularity model prediction task.
 
@@ -217,6 +223,8 @@ def _grid_singularity_worker(q:int, slice_type:str, y_matrix:ndarray,
     Options : GridOptions
         Options object that contains the necessary key-value parameters
         for grid predictions.
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
 
     Returns
     -------
@@ -231,7 +239,7 @@ def _grid_singularity_worker(q:int, slice_type:str, y_matrix:ndarray,
     _worker_progress_printout(q, theta_matrix)
 
     # Call grid singularity for a single task and send inputs to CSA's API
-    job_id, job_code = _post_grid_singularity_inputs(y=y, X=X, theta=theta, Options=Options)
+    job_id, job_code = _post_grid_singularity_inputs(y=y, X=X, theta=theta, Options=Options, is_binary=is_binary)
 
     # Return job_id and job_code
     return job_id, job_code

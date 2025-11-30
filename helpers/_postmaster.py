@@ -35,18 +35,72 @@ from csa_prediction_engine.helpers._payload_handler import (
     get_quota
 )
 
-# Utlity function for processing ndarrays withing dictionaries
-from csa_common_lib.helpers._conversions import (
-        convert_ndarray_to_list
-    ) 
-
+# Utility function for processing ndarrays within dictionaries
+from csa_common_lib.helpers._conversions import convert_ndarray_to_list
 
 from csa_common_lib.enum_types.functions import PSRFunction
 from csa_common_lib.classes.prediction_options import PredictionOptions, MaxFitOptions, GridOptions
+from typing import Callable
+from functools import wraps
+
+# Mapping from base function types to their binary equivalents
+_BINARY_FUNCTION_MAP = {
+    PSRFunction.PSR: PSRFunction.PSR_BINARY,
+    PSRFunction.MAXFIT: PSRFunction.MAXFIT_BINARY,
+    PSRFunction.GRID: PSRFunction.GRID_BINARY,
+    PSRFunction.GRID_SINGULARITY: PSRFunction.GRID_SINGULARITY_BINARY
+}
+
+
+def _create_post_job_decorator(base_function_type: PSRFunction, function_name: str):
+    """
+    Factory function that creates a decorator for posting job inputs.
+    
+    This decorator handles the common logic for posting prediction jobs,
+    including option conversion, function type selection (binary vs non-binary),
+    and error handling.
+    
+    Parameters
+    ----------
+    base_function_type : PSRFunction
+        Base function type (non-binary version) for this prediction.
+    function_name : str
+        Function name for error messages and logging.
+        
+    Returns
+    -------
+    Callable
+        A decorator function that wraps the post job logic.
+    """
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(y, X, theta, Options, is_binary: bool = False):
+            # Retrieve Options dictionary and convert any ndarrays to lists
+            options_dict = convert_ndarray_to_list(Options.options)
+            
+            # Determine function type (binary or non-binary)
+            function_type = _BINARY_FUNCTION_MAP.get(base_function_type, base_function_type) if is_binary else base_function_type
+            
+            # Post job inputs to the server
+            response, job_id, job_code = post_job(
+                function_type,
+                y=y,
+                X=X,
+                theta=theta,
+                **options_dict)
+            
+            # Print the response if it's not None and both job_id and job_code are None
+            if response is not None and job_id is None and job_code is None:
+                print(f"csanalytics:postmaster:_jobs:{function_name}:{response}")
+            
+            return job_id, job_code
+        return wrapper
+    return decorator
 
 
 # PSR prediction
-def _post_predict_inputs(y, X, theta, Options:PredictionOptions):
+@_create_post_job_decorator(PSRFunction.PSR, "_post_predict_inputs")
+def _post_predict_inputs(y, X, theta, Options: PredictionOptions, is_binary: bool = False):
     """ Runs and evaluates a prediction using the partial sample regression 
     model. Returns yhat and model details. If threshold=0 for 
     is_threshold_percent=True, weights converge to full sample regression.
@@ -64,6 +118,9 @@ def _post_predict_inputs(y, X, theta, Options:PredictionOptions):
         Options class to organize and persist parameters used for the
         partial sample regression prediction model.
 
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
+        
     Returns
     -------
     job_id : int
@@ -71,32 +128,11 @@ def _post_predict_inputs(y, X, theta, Options:PredictionOptions):
     job_code : str
         Job code response from server.
     """
-    
-    # Initialize results
-    job_id = None
-    job_code = None
-
-    # Retrieve Options dictionary and convert any ndarrays to lists
-    options_dict = convert_ndarray_to_list(Options.options)
-    
-    # Post partial-sample regression model inputs to the server and
-    # let is calculate results.
-    response, job_id, job_code = post_job(
-        PSRFunction.PSR,
-        y=y,
-        X=X,
-        theta=theta,
-        **options_dict)
-    
-    # Print the response if it's not None and both job_id and job_code are None
-    if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_predict_inputs:{response}")
-    
-    # Return results object
-    return job_id, job_code
+    pass  # Implementation handled by decorator
     
     
-def _post_maxfit_inputs(y, X, theta, Options:MaxFitOptions):
+@_create_post_job_decorator(PSRFunction.MAXFIT, "_post_maxfit_inputs")
+def _post_maxfit_inputs(y, X, theta, Options: MaxFitOptions, is_binary: bool = False):
     """ Runs and evaluates a prediction using the partial sample regression 
     model and solves for maximum adjusted fit. 
     Returns yhat and model details.
@@ -114,6 +150,9 @@ def _post_maxfit_inputs(y, X, theta, Options:MaxFitOptions):
         Options class to organize and persist parameters used for the
         maximum fit prediction model.
 
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
+        
     Returns
     -------
     job_id : int
@@ -121,31 +160,11 @@ def _post_maxfit_inputs(y, X, theta, Options:MaxFitOptions):
     job_code : str
         Job code response from server.
     """
-    
-    
-    # Initialize results
-    job_id = None
-    job_code = None
+    pass  # Implementation handled by decorator
 
-    # Retrieve Options dictionary and convert any ndarrays to lists
-    options_dict = convert_ndarray_to_list(Options.options)
     
-    # Post maximum fit job inputs and let the server compute
-    response, job_id, job_code = post_job(
-        PSRFunction.MAXFIT,
-        y=y,
-        X=X,
-        theta=theta,
-        **options_dict)
-    
-    # Print the response if it's not None and both job_id and job_code are None
-    if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_maxfit_inputs:{response}")
-    
-    # Return results object
-    return job_id, job_code
-    
-def _post_grid_inputs(y, X, theta, Options:GridOptions):
+@_create_post_job_decorator(PSRFunction.GRID, "_post_grid_inputs")
+def _post_grid_inputs(y, X, theta, Options: GridOptions, is_binary: bool = False):
     """ Runs and evaluates a prediction using the partial sample regression 
     model and solves for maximum adjusted fit with optimal variable selection. 
     This is also known as the grid optimal partial sample regression.
@@ -164,6 +183,9 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
         Options class to organize and persist parameters used for the
         grid (and grid singularity) prediction model.
 
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
+        
     Returns
     -------
     job_id : int
@@ -171,32 +193,11 @@ def _post_grid_inputs(y, X, theta, Options:GridOptions):
     job_code : str
         Job code response from server.
     """
-    
-    
-    # Initialize results
-    job_id = None
-    job_code = None
-
-    # Retrieve Options dictionary and convert any ndarrays to lists
-    options_dict = convert_ndarray_to_list(Options.options)
-
-    # Post the grid prediction job and let the server compute everything
-    response, job_id, job_code = post_job(
-        PSRFunction.GRID,
-        y=y,
-        X=X,
-        theta=theta,
-        **options_dict)
-    
-    # Print the response if it's not None and both job_id and job_code are None
-    if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_grid_inputs:{response}")
-    
-    # Return results object
-    return job_id, job_code
+    pass  # Implementation handled by decorator
 
 
-def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
+@_create_post_job_decorator(PSRFunction.GRID_SINGULARITY, "_post_grid_singularity_inputs")
+def _post_grid_singularity_inputs(y, X, theta, Options: GridOptions, is_binary: bool = False):
     """ Runs and evaluates a grid singularity prediction using the 
     partial sample regression model and solves for maximum adjusted 
     fit with optimal variable selection.
@@ -215,6 +216,9 @@ def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
         Options class to organize and persist parameters used for the
         grid (and grid singularity) prediction model.
 
+    is_binary : bool, optional
+        Whether to use the binary version of the function, by default False.
+        
     Returns
     -------
     job_id : int
@@ -222,29 +226,7 @@ def _post_grid_singularity_inputs(y, X, theta, Options:GridOptions):
     job_code : str
         Job code response from server.
     """
-    
-    
-    # Initialize results
-    job_id = None
-    job_code = None
-
-    # Retrieve Options dictionary and convert any ndarrays to lists
-    options_dict = convert_ndarray_to_list(Options.options)
-    
-    # Post the grid singularity job and let the server compute everything
-    response, job_id, job_code = post_job(
-        PSRFunction.GRID_SINGULARITY,
-        y=y,
-        X=X,
-        theta=theta,
-        **options_dict) # Will need to update api endpoints  
-    
-    # Print the response if it's not None and both job_id and job_code are None
-    if response is not None and job_id is None and job_code is None:
-        print(f"csanalytics:postmaster:_jobs:_post_grid_inputs:{response}")
-    
-    # Return results object
-    return job_id, job_code
+    pass  # Implementation handled by decorator
 
 
 def _get_results(job_id: int, job_code:str):
@@ -280,6 +262,30 @@ def _get_results(job_id: int, job_code:str):
         
     # Return results
     return yhat, output_details
+
+
+def _get_results_worker(job_id: int, job_code: str):
+    """Worker function wrapper for retrieving results.
+    
+    This is a convenience wrapper around _get_results for consistency
+    with parallel worker naming conventions.
+    
+    Parameters
+    ----------
+    job_id : int
+        Job id.
+    job_code : str
+        Job code.
+        
+    Returns
+    -------
+    yhat : ndarray [1-by-T]
+        Prediction outcome.
+    output_details : dict
+        Model details accesible via key-value pairs.
+    """
+    return _get_results(job_id, job_code)
+
 
 def _get_quota(quota_type:str='summary', api_key:str=None):
     """Returns a json response body containing data for the selected

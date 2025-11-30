@@ -57,11 +57,17 @@ from csa_prediction_engine.parallel._dispatchers import (
 
 # Dispatcher mapping based on PSRFunction type.
 # Maps different prediction tasks to their corresponding dispatcher functions.
+# Binary functions use the same dispatchers (is_binary flag is passed to workers).
 _DISPATCHER_MAP = {
     PSRFunction.GRID: dispatch_grid_task,
     PSRFunction.GRID_SINGULARITY: dispatch_grid_singularity_task,
     PSRFunction.MAXFIT: dispatch_maxfit_task,
-    PSRFunction.PSR: dispatch_psr_task
+    PSRFunction.PSR: dispatch_psr_task,
+    # Binary functions map to the same dispatchers
+    PSRFunction.GRID_BINARY: dispatch_grid_task,
+    PSRFunction.GRID_SINGULARITY_BINARY: dispatch_grid_singularity_task,
+    PSRFunction.MAXFIT_BINARY: dispatch_maxfit_task,
+    PSRFunction.PSR_BINARY: dispatch_psr_task
 }
 
 
@@ -100,12 +106,20 @@ def run_multi_y(model_type:PSRFunction, y_matrix:ndarray, X:ndarray, theta:ndarr
     # Route X input matrix depending on payload size
     X = route_X_input(model_type=model_type, y=y_matrix, X=X, theta=theta, Options=Options)
 
+    # Determine if this is a binary function
+    is_binary = model_type in (
+        PSRFunction.PSR_BINARY,
+        PSRFunction.MAXFIT_BINARY,
+        PSRFunction.GRID_BINARY,
+        PSRFunction.GRID_SINGULARITY_BINARY
+    )
+
     # Prepare the single prediction task for PPSR
     inputs_for_post = [
-        (q, "y", y_matrix, X, theta, Options) for q in range(y_matrix.shape[1])
+        (q, "y", y_matrix, X, theta, Options, is_binary) for q in range(y_matrix.shape[1])
     ]
     
-    # Get the corresponding dispatcher function
+    # Get the corresponding dispatcher function (binary functions use same dispatchers)
     dispatcher = _DISPATCHER_MAP.get(model_type)
     
     if dispatcher is None:
@@ -167,17 +181,25 @@ def run_multi_theta(model_type:PSRFunction, y:ndarray, X:ndarray, theta_matrix:n
 
     # Route X input matrix depending on payload size
     X = route_X_input(model_type=model_type, y=y, X=X, theta=theta_matrix, Options=Options)
+    
+    # Determine if this is a binary function
+    is_binary = model_type in (
+        PSRFunction.PSR_BINARY,
+        PSRFunction.MAXFIT_BINARY,
+        PSRFunction.GRID_BINARY,
+        PSRFunction.GRID_SINGULARITY_BINARY
+    )
            
     # Prepare the single prediction task stratified by circumstances (theta)
     inputs_for_post = [
-        (q, "theta", y, X, theta_matrix, Options) for q in range(theta_matrix.shape[0])
+        (q, "theta", y, X, theta_matrix, Options, is_binary) for q in range(theta_matrix.shape[0])
     ]
     
-    # Get the corresponding dispatcher function
+    # Get the corresponding dispatcher function (binary functions use same dispatchers)
     dispatcher = _DISPATCHER_MAP.get(model_type)
     
     if dispatcher is None:
-        raise ValueError(f"run_multi_y: Invalid model type: {model_type}")
+        raise ValueError(f"run_multi_theta: Invalid model type: {model_type}")
 
     # Execute the prediction tasks
     yhat, yhat_details = run_tasks_api(inputs_for_post, dispatcher, 
