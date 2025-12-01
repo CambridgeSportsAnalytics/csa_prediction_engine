@@ -79,6 +79,10 @@ from .api_client import (
     predict_maxfit,
     predict_grid,
     predict_grid_singularity,
+    predict_psr_binary,
+    predict_maxfit_binary,
+    predict_grid_binary,
+    predict_grid_singularity_binary,
     get_api_quota
 )
 
